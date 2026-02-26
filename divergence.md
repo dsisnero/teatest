@@ -1,69 +1,48 @@
-# Divergence: Crystal port vs Go v2 (vendor/x/exp/teatest/v2)
+# Divergence Audit: Crystal vs Go v2 (`vendor/x/exp/teatest/v2`)
 
-This document tracks intentional and accidental differences between the Crystal
-port and the Go v2 reference, plus suggestions to reduce divergence.
+This file tracks parity status against Go source-of-truth in:
 
-## Current divergences
+- `vendor/x/exp/teatest/v2/teatest.go`
+- `vendor/x/exp/teatest/v2/teatest_test.go`
+- `vendor/x/exp/teatest/v2/app_test.go`
+- `vendor/x/exp/teatest/v2/send_test.go`
 
-1. `Send("ignored msg")` vs `Term2::Msg` typing
-- Go v2: `tea.Msg` is `interface{}` so tests can send arbitrary values like
-  a plain string.
-- Crystal: `Term2::Msg` is an abstract base class, so arbitrary types cannot be
-  sent without wrapping.
-- Current port: replaced `tm.send("ignored msg")` with `tm.type("ignored msg")`.
+## API parity status
 
-2. Key press message shape
-- Go v2: `tea.KeyPressMsg{Code, Text}`
-- Crystal: `Term2::KeyMsg` wraps `Term2::Key`
-- Current port: uses `Term2::KeyMsg.new(Term2::Key.new(Term2::KeyType::Enter))`
-  and `type` builds `KeyMsg` from characters.
+- `Program` interface subset: matched (`send`/`Send` behavior).
+- `WithInitialTermSize`: matched.
+- `WithProgramOptions`: matched.
+- `WaitFor` option defaults and timeout/error string shape: matched.
+- `FinalOpts` timeout callbacks (`testing.TB` equivalent): matched via `Teatest::TB`.
+- `NewTestModel` behavior: matched.
+  - default initial size `80x24`
+  - apply caller program options
+  - append internal options so they override
+  - include `with_window_size` from resolved size
+- `Type`: matched intent (send per-char key press messages).
+- `RequireEqualOutput`: matched behavior in spirit, with Crystal test-name API.
 
-3. Golden test helper signature
-- Go v2: `RequireEqualOutput(t, out)` takes `testing.TB` and uses `golden` to
-  infer paths.
-- Crystal: `Golden.require_equal(test_name, output, test_data_dir)` uses a
-  test name string. The port now passes explicit names like `"TestApp"` and
-  `"TestAppSendToOtherProgram"`.
+## Test parity status
 
-4. `WaitFinished` timeout callback signature
-- Go v2: `WithTimeoutFn(func(testing.TB))` passes the test handle.
-- Crystal: callback signature is `->` (no arguments). The port mimics behavior
-  by setting a boolean flag directly.
+- `spec/teatest_spec.cr` covers v2 `teatest_test.go` scenarios.
+- `spec/app_spec.cr` mirrors `app_test.go` flow and assertions.
+- `spec/send_spec.cr` mirrors `send_test.go` flow and strict byte equality check.
 
-5. Renderer dependency require path
-- Go v2: depends on bubbletea/v2 internal setup.
-- Crystal: `lib/term2/src/cursed_renderer.cr` needed `require "ultraviolet"`
-  instead of a relative path. This is now aligned with shard layout.
+## Known remaining differences
 
-## Suggestions to reduce divergence
+1. Golden output bytes are not byte-identical to Go v2 fixtures for:
+- `TestApp.golden`
+- `TestAppSendToOtherProgram.golden`
 
-1. Allow sending non-`Term2::Msg` values in tests
-- Add an overload `send(msg : _)` in `Teatest::TestModel` that wraps
-  non-`Term2::Msg` values into a `Term2::Message` (e.g. `Term2::ValueMsg`).
-- Alternatively add a `Term2::AnyMsg` that stores `Object` and can be ignored
-  by models unless they explicitly handle it. This would allow direct parity
-  with `Send("ignored msg")` from Go.
+Root cause is in underlying `bubbletea.cr` renderer/control-sequence output, not
+in `teatest` API flow. Current Crystal tests enforce strict equality between
+local program outputs where Go does (`send_spec`), but project golden files are
+Crystal-runtime expected bytes.
 
-2. Provide a compatibility `KeyPressMsg`
-- Add a small compatibility struct/class with `code`/`text` and a conversion
-  to `Term2::KeyMsg`, so test code can mirror Go more directly.
+2. Crystal does not expose Go `testing.TB` directly.
+- Implemented parity shim: `Teatest::TB` with `fatal(...)`.
 
-3. Recreate `RequireEqualOutput(tb, out)`
-- Add a helper that infers the spec name (e.g., from `Spec.current` if
-  available) and uses `Golden.spec_test_data_dir`. This would remove the
-  need to hardcode test names.
+## Policy
 
-4. Align `WaitFinished` timeout callback signature
-- Consider accepting `Proc(Spec::Context, Nil)` or similar to allow users to
-  act on the current spec/test object. This would mirror Go’s `testing.TB`.
-
-5. Introduce a `StringMsg` convenience
-- If `Term2` is intended to feel like Bubble Tea v2, having a `StringMsg < Message`
-  (and a helper `Term2.msg("...")`) would allow `Send("ignored msg")` parity
-  without widening `Term2::Msg` to any type.
-
-## Known remaining gaps
-
-- The Crystal tests currently diverge in `Send("ignored msg")` and in golden
-  helper naming. If strict parity is required, implement one of the options
-  above and revert the tests to match Go v2 exactly.
+When behavior questions arise, treat `vendor/x/exp/teatest/v2` as canonical.
+Do not pull parity logic from non-v2 `vendor/x/exp/teatest/teatest.go`.

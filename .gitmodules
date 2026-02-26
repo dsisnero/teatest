@@ -1,3 +1,4 @@
 [submodule "vendor/x"]
 	path = vendor/x
 	url = https://github.com/charmbracelet/x.git
+	branch = main

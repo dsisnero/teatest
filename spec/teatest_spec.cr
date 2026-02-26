@@ -43,9 +43,22 @@ describe Teatest do
       timed_out = false
       tm.wait_finished([
         Teatest.with_final_timeout(1.nanosecond),
-        Teatest.with_timeout_fn(-> { timed_out = true }),
+        Teatest.with_timeout_fn(->(_tb : Teatest::TB) { timed_out = true }),
       ])
       timed_out.should be_true
+    ensure
+      tm.quit
+    end
+  end
+
+  it "with_program_options allows options but teatest options override" do
+    tm = Teatest.new_test_model(M.new("a"), [
+      Teatest.with_program_options(Tea.with_window_size(1, 1)),
+      Teatest.with_initial_term_size(70, 30),
+    ])
+    begin
+      tm.program.width.should eq 70
+      tm.program.height.should eq 30
     ensure
       tm.quit
     end
@@ -53,19 +66,20 @@ describe Teatest do
 end
 
 struct M
-  include Term2::Model
+  include Bubbletea::Model
+
   def initialize(@value : String)
   end
 
-  def init : Term2::Cmd
+  def init : Bubbletea::Cmd?
     nil
   end
 
-  def update(msg : Term2::Msg) : {Term2::Model, Term2::Cmd}
+  def update(msg : Tea::Msg)
     {self, nil}
   end
 
-  def view : String
-    @value
+  def view : Bubbletea::View
+    Bubbletea::View.new(@value)
   end
 end

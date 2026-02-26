@@ -29,8 +29,9 @@ describe "Teatest send" do
   end
 end
 
-struct ConnectedModel
-  include Term2::Model
+class ConnectedModel
+  include Bubbletea::Model
+
   property programs : Array(Teatest::Program)
   @msgs : Array(String)
 
@@ -39,35 +40,37 @@ struct ConnectedModel
     @msgs = [] of String
   end
 
-  def init : Term2::Cmd
+  def init : Bubbletea::Cmd?
     nil
   end
 
-  def update(msg : Term2::Msg) : {Term2::Model, Term2::Cmd}
+  def update(msg : Tea::Msg)
     case msg
-    when Term2::KeyMsg
-      case msg.key.to_s
+    when Tea::Key
+      case msg.string
       when "p"
-        send = Ping.new("from #{@name}")
-        @msgs << send.value
-        @programs.each { |p| p.send(send) }
-        puts %(sent ping "#{send.value}" to others)
+        ping = Ping.new("from #{@name}")
+        @msgs << ping.value
+        @programs.each(&.send(ping))
+        puts %(sent ping "#{ping.value}" to others)
       when "q"
-        return {self, Term2.quit}
+        return {self.as(Bubbletea::Model), Tea.quit}
       end
     when Ping
       puts %(rcvd ping "#{msg.value}" on #{@name})
       @msgs << msg.value
     end
-    {self, nil}
+    {self.as(Bubbletea::Model), nil}
   end
 
-  def view : String
-    "All pings:\n" + @msgs.join("\n")
+  def view : Bubbletea::View
+    Bubbletea::View.new("All pings:\n" + @msgs.join("\n"))
   end
 end
 
-class Ping < Term2::Message
+struct Ping
+  include Tea::Msg
+
   getter value : String
 
   def initialize(@value : String)

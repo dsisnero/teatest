@@ -9,8 +9,8 @@ crystal: ">= 1.19.1"
 license: MIT
 
 dependencies:
-  term2:
-    github: dsisnero/term2
-    branch: v2-exp
+  bubbletea:
+    github: dsisnero/bubbletea.cr
+    branch: main
   golden:
     github: dsisnero/golden

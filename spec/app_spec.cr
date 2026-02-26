@@ -5,10 +5,10 @@ describe "Teatest app" do
     model = CountdownModel.new(10)
     tm = Teatest.new_test_model(model, [Teatest.with_initial_term_size(70, 30)])
     begin
-      sleep 1.2
+      sleep 1.2.seconds
       tm.type("I'm typing things, but it'll be ignored by my program")
-      tm.type("ignored msg")
-      tm.send(Term2::KeyMsg.new(Term2::Key.new(Term2::KeyType::Enter)))
+      tm.send("ignored msg")
+      tm.send(Tea.key(Tea::KeyType::Enter))
 
       tm.quit
 
@@ -17,7 +17,13 @@ describe "Teatest app" do
       output_str.should match(/This program will exit in \d+ seconds/)
       Teatest.require_equal_output("TestApp", output)
 
-      tm.final_model.as(CountdownModel).value.should eq 9
+      final_model = tm.final_model
+      final_model.should_not be_nil
+      if model = final_model
+        model.as(CountdownModel).value.should eq 9
+      else
+        fail "expected final model"
+      end
     ensure
       tm.quit
     end
@@ -27,8 +33,8 @@ describe "Teatest app" do
     model = CountdownModel.new(10)
     tm = Teatest.new_test_model(model, [Teatest.with_initial_term_size(70, 30)])
     begin
-      sleep 1.2
-      tm.type("ignored msg")
+      sleep 1.2.seconds
+      tm.send("ignored msg")
 
       output = read_bytes(tm.output)
       String.new(output).should contain("9 seconds")
@@ -38,10 +44,16 @@ describe "Teatest app" do
         Teatest.with_check_interval(10.milliseconds),
       ])
 
-      tm.send(Term2::KeyMsg.new(Term2::Key.new(Term2::KeyType::Enter)))
+      tm.send(Tea.key(Tea::KeyType::Enter))
       tm.quit
 
-      tm.final_model.as(CountdownModel).value.should eq 7
+      final_model = tm.final_model
+      final_model.should_not be_nil
+      if model = final_model
+        model.as(CountdownModel).value.should eq 7
+      else
+        fail "expected final model"
+      end
     ensure
       tm.quit
     end
@@ -49,27 +61,28 @@ describe "Teatest app" do
 end
 
 struct CountdownModel
-  include Term2::Model
+  include Bubbletea::Model
+
   getter value : Int32
 
   def initialize(@value : Int32)
   end
 
-  def init : Term2::Cmd
-    -> {
+  def init : Bubbletea::Cmd?
+    -> : Tea::Msg? {
       sleep 1.second
-      TickMsg.new.as(Term2::Msg)
+      TickMsg.new
     }
   end
 
-  def update(msg : Term2::Msg) : {Term2::Model, Term2::Cmd}
+  def update(msg : Tea::Msg)
     case msg
-    when Term2::KeyMsg
-      {self, Term2.quit}
+    when Tea::Key
+      {self, Tea.quit}
     when TickMsg
       @value -= 1
       if @value <= 0
-        {self, Term2.quit}
+        {self, Tea.quit}
       else
         {self, init}
       end
@@ -78,10 +91,11 @@ struct CountdownModel
     end
   end
 
-  def view : String
-    "Hi. This program will exit in #{@value} seconds. To quit sooner press any key.\n"
+  def view : Bubbletea::View
+    Bubbletea::View.new("Hi. This program will exit in #{@value} seconds. To quit sooner press any key.\n")
   end
 end
 
-class TickMsg < Term2::Message
+struct TickMsg
+  include Tea::Msg
 end

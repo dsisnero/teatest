@@ -1,22 +1,22 @@
-require "term2"
+require "bubbletea"
 require "golden"
 
 module Teatest
   VERSION = "0.1.0"
 
-  # Program defines the subset of the Term2::Program API we need for testing.
+  # Program defines the subset of the Bubble Tea program API we need for testing.
   module Program
-    abstract def send(msg : Term2::Msg)
+    abstract def send(msg : Tea::Msg)
   end
 
   # TestModelOptions defines all options available to the test function.
   class TestModelOptions
-    property size : Term2::WindowSizeMsg
-    property program_opts : Array(Term2::ProgramOption)
+    property size : Bubbletea::WindowSizeMsg
+    property program_opts : Array(Bubbletea::ProgramOption)
 
     def initialize
-      @size = Term2::WindowSizeMsg.new(0, 0)
-      @program_opts = [] of Term2::ProgramOption
+      @size = Bubbletea::WindowSizeMsg.new(0, 0)
+      @program_opts = [] of Bubbletea::ProgramOption
     end
   end
 
@@ -26,14 +26,14 @@ module Teatest
   # WithInitialTermSize sets the initial terminal size.
   def self.with_initial_term_size(x : Int32, y : Int32) : TestOption
     ->(opts : TestModelOptions) {
-      opts.size = Term2::WindowSizeMsg.new(x, y)
+      opts.size = Bubbletea::WindowSizeMsg.new(x, y)
     }
   end
 
-  # WithProgramOptions adds Term2::ProgramOption values to the test model during initialization.
-  def self.with_program_options(*options : Term2::ProgramOption) : TestOption
+  # WithProgramOptions adds Bubble Tea ProgramOptions to the test model.
+  def self.with_program_options(*options : Bubbletea::ProgramOption) : TestOption
     ->(opts : TestModelOptions) {
-      opts.program_opts.concat(options)
+      opts.program_opts = options.to_a
     }
   end
 
@@ -71,55 +71,54 @@ module Teatest
 
   private def self.do_wait_for(r : IO, condition : Bytes -> Bool, options : Array(WaitForOption)) : Exception?
     wf = WaitingForContext.new
-    options.each { |opt| opt.call(wf) }
-
-    if r.is_a?(SafeReadWriter)
-      start = Time.monotonic
-      last = Bytes.empty
-      while (Time.monotonic - start) <= wf.duration
-        last = r.snapshot
-        if condition.call(last)
-          return nil
-        end
-        sleep wf.check_interval
-      end
-      return Exception.new("WaitFor: condition not met after #{format_duration(wf.duration)}. Last output:\n#{String.new(last)}")
-    end
+    options.each(&.call(wf))
 
     buffer = IO::Memory.new
-    start = Time.monotonic
-    while (Time.monotonic - start) <= wf.duration
+    chunk = Bytes.new(4096)
+    start = Time.instant
+
+    while (Time.instant - start) <= wf.duration
       begin
-        chunk = r.gets_to_end
-        buffer << chunk if chunk
+        while (n = r.read(chunk)) > 0
+          buffer.write(chunk[0, n])
+        end
       rescue ex
         return Exception.new("WaitFor: #{ex.message}", cause: ex)
       end
 
       if condition.call(buffer.to_slice)
-        return nil
+        return
       end
+
       sleep wf.check_interval
     end
-    Exception.new("WaitFor: condition not met after #{format_duration(wf.duration)}. Last output:\n#{buffer.to_s}")
+
+    Exception.new("WaitFor: condition not met after #{format_duration(wf.duration)}. Last output:\n#{buffer}")
   end
 
   private def self.format_duration(duration : Time::Span) : String
-    if duration < 1.second
-      "#{duration.total_milliseconds.to_i}ms"
-    elsif duration < 1.minute
-      "#{duration.total_seconds.to_i}s"
-    elsif duration < 1.hour
-      "#{duration.total_minutes.to_i}m"
-    else
-      "#{duration.total_hours.to_i}h"
-    end
+    ms = duration.total_milliseconds
+    return "#{ms.to_i}ms" if ms < 1000
+
+    s = duration.total_seconds
+    return "#{s.to_i}s" if s == s.to_i
+
+    secs = s.round(3).to_s
+    secs = secs.gsub(/\.0+$/, "")
+    secs = secs.gsub(/(\.\d*?)0+$/, "\\1")
+    "#{secs}s"
   end
 
   # FinalOpts represents the options for FinalModel and FinalOutput.
+  class TB
+    def fatal(message : String) : NoReturn
+      raise message
+    end
+  end
+
   class FinalOpts
     property timeout : Time::Span
-    property on_timeout : Proc(Nil)?
+    property on_timeout : Proc(TB, Nil)?
 
     def initialize
       @timeout = 0.seconds
@@ -131,7 +130,7 @@ module Teatest
   alias FinalOpt = Proc(FinalOpts, Nil)
 
   # WithTimeoutFn allows to define what happens when WaitFinished times out.
-  def self.with_timeout_fn(fn : Proc(Nil)) : FinalOpt
+  def self.with_timeout_fn(fn : Proc(TB, Nil)) : FinalOpt
     ->(opts : FinalOpts) { opts.on_timeout = fn }
   end
 
@@ -140,23 +139,28 @@ module Teatest
     ->(opts : FinalOpts) { opts.timeout = d }
   end
 
-  class TestModel(M)
+  # TestModel is a model that is being tested.
+  class TestModel
     include Program
-    getter program : Term2::Program(M)
+
+    getter program : Bubbletea::Program
+
     @in : IO::Memory
     @out : SafeReadWriter
-    @model_ch : Channel(M)
-    @model : M?
+    @model_ch : Channel(Bubbletea::Model?)
+    @model : Bubbletea::Model?
     @done_ch : Channel(Bool)
     @done : Bool
     @done_mutex : Mutex
+    @run_err : Exception?
 
-    def initialize(@program : Term2::Program(M), @in : IO::Memory, @out : SafeReadWriter)
-      @model_ch = Channel(M).new(1)
+    def initialize(@program : Bubbletea::Program, @in : IO::Memory, @out : SafeReadWriter)
+      @model_ch = Channel(Bubbletea::Model?).new(1)
       @done_ch = Channel(Bool).new(1)
       @done = false
       @done_mutex = Mutex.new
       @model = nil
+      @run_err = nil
     end
 
     # WaitFinished waits for the app to finish.
@@ -165,12 +169,12 @@ module Teatest
     end
 
     # FinalModel returns the resulting model from program.run.
-    def final_model(opts : Array(FinalOpt) = [] of FinalOpt) : M
+    def final_model(opts : Array(FinalOpt) = [] of FinalOpt) : Bubbletea::Model?
       wait_done(opts)
       if model = @model_ch.receive?
         @model = model
       end
-      @model.not_nil!
+      @model
     end
 
     # FinalOutput returns the program's final output io.Reader.
@@ -185,8 +189,13 @@ module Teatest
     end
 
     # Send sends messages to the underlying program.
-    def send(msg : Term2::Msg) : Nil
+    def send(msg : Tea::Msg) : Nil
       @program.send(msg)
+    end
+
+    # Send accepts any value and wraps non-Msg values like Go's tea.Msg (interface{}).
+    def send(value) : Nil
+      @program.send(Tea.wrap(value))
     end
 
     # Quit quits the program and releases the terminal.
@@ -196,12 +205,14 @@ module Teatest
 
     # Type types the given text into the given program.
     def type(s : String) : Nil
-      s.each_char do |c|
-        @program.send(Term2::KeyMsg.new(Term2::Key.new(c)))
+      s.each_char do |char|
+        @program.send(Tea.key(char))
+        Fiber.yield
       end
     end
 
-    protected def send_done(model : M) : Nil
+    protected def send_done(model : Bubbletea::Model?, err : Exception?) : Nil
+      @run_err = err if err
       @model_ch.send(model)
       @done_ch.send(true)
     end
@@ -217,12 +228,13 @@ module Teatest
       return unless should_wait
 
       fopts = FinalOpts.new
-      opts.each { |opt| opt.call(fopts) }
+      opts.each(&.call(fopts))
+
       if fopts.timeout > 0.seconds
         select
         when timeout(fopts.timeout)
           if on_timeout = fopts.on_timeout
-            on_timeout.call
+            on_timeout.call(TB.new)
           else
             raise "timeout after #{fopts.timeout}"
           end
@@ -231,38 +243,40 @@ module Teatest
       else
         @done_ch.receive
       end
+
+      if run_err = @run_err
+        raise run_err
+      end
     end
   end
 
   # NewTestModel makes a new TestModel which can be used for tests.
-  def self.new_test_model(m : M, options : Array(TestOption) = [] of TestOption) : TestModel(M) forall M
+  def self.new_test_model(m : Bubbletea::Model, options : Array(TestOption) = [] of TestOption) : TestModel
     input = IO::Memory.new
     output = SafeReadWriter.new(IO::Memory.new)
 
-    # We always have an initial size.
+    # Match Go v2 teatest: always start with an initial size unless overridden.
     options = [with_initial_term_size(80, 24)] + options
 
     opts = TestModelOptions.new
-    options.each { |opt| opt.call(opts) }
+    options.each(&.call(opts))
 
-    program_opts = opts.program_opts + [
-      Term2::WithInput.new(input),
-      Term2::WithOutput.new(output),
-      Term2::WithoutSignalHandler.new,
-    ]
+    program = Bubbletea::Program.new(m)
+    opts.program_opts.each(&.call(program))
+    Tea.with_input(input).call(program)
+    Tea.with_output(output).call(program)
+    Tea.without_signals.call(program)
+    Tea.with_window_size(opts.size.width, opts.size.height).call(program)
 
-    program_options = Term2::ProgramOptions.new
-    program_opts.each { |opt| program_options.add(opt) }
-    program = Term2::Program(M).new(m, input, output, program_options)
-    tm = TestModel(M).new(program, input, output)
+    tm = TestModel.new(program, input, output)
 
-    Signal::INT.trap do
+    Process.on_terminate do
       tm.program.kill
     end
 
     spawn do
-      model = program.run
-      tm.send_done(model)
+      model, err = program.run
+      tm.send_done(model, err)
     end
 
     if opts.size.width != 0
@@ -292,15 +306,12 @@ module Teatest
         data = @rw.to_slice
         remaining = data.size - @read_pos
         return 0 if remaining <= 0
+
         n = Math.min(slice.size, remaining)
         slice.copy_from(data[@read_pos, n])
         @read_pos += n
         n
       end
-    end
-
-    def snapshot : Bytes
-      @lock.synchronize { @rw.to_slice.dup }
     end
 
     def write(slice : Bytes) : Nil
