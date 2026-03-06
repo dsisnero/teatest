@@ -30,3 +30,5 @@ coverage/
 
 # Agent settings (user-local)
 .claude/
+/.beads
+/.shards-cache/github.com
