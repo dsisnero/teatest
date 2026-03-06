@@ -1,10 +1,32 @@
-/docs/
+# Crystal build artifacts
+/.crystal-cache/
 /lib/
-/bin/
 /.shards/
+/bin/
 *.dwarf
 
-# Libraries don't need dependency lock
-# Dependencies will be locked in applications that use them
+# Dependencies
 /shard.lock
+
+# Temporary directories
+/temp/
 /d:/tmp
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test coverage
+coverage/
+
+# Agent settings (user-local)
+.claude/

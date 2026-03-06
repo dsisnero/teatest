@@ -13,3 +13,7 @@ dependencies:
     github: dsisnero/bubbletea.cr
   golden:
     github: dsisnero/golden
+
+development_dependencies:
+  ameba:
+    github: crystal-ameba/ameba

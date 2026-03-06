@@ -1,0 +1,9 @@
+[tool.rumdl]
+version = "0.1.0"
+language = "crystal"
+exclude = ["lib/", ".crystal-cache/", ".shards/", "spec/", "vendor/"]
+include = ["src/"]
+output = "docs/architecture.md"
+format = "markdown"
+title = "Architecture Overview"
+generate_on_save = false

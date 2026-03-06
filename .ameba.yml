@@ -1,2 +1,41 @@
+# Ameba configuration for Crystal projects
+# See https://github.com/crystal-ameba/ameba
+
+# Disable specific rules
 Naming/AccessorMethodName:
   Enabled: false
+
+# Crystal porting project specific settings
+Style/RedundantReturn:
+  Enabled: false
+
+Style/UnlessElse:
+  Enabled: false
+
+# Performance rules (optional but recommended)
+Performance/SizeAfter:
+  Enabled: true
+
+Performance/StartWith:
+  Enabled: true
+
+Performance/EndWith:
+  Enabled: true
+
+# Lint rules
+Lint/UnusedArgument:
+  Enabled: true
+
+Lint/MissingEnv:
+  Enabled: true
+
+Lint/DebugCalls:
+  Enabled: true
+  DebugMethods: ["p", "pp", "puts", "print"]
+
+# Exclude vendor directory (upstream source)
+AllCops:
+  Exclude:
+    - vendor/**/*
+    - lib/**/*
+    - spec/**/*
