@@ -203,6 +203,11 @@ module Teatest
       @program.quit
     end
 
+    # GetProgram gets the TestModel's program.
+    def get_program : Bubbletea::Program
+      @program
+    end
+
     # Type types the given text into the given program.
     def type(s : String) : Nil
       s.each_char do |char|

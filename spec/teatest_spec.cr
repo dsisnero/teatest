@@ -63,6 +63,15 @@ describe Teatest do
       tm.quit
     end
   end
+
+  it "get_program returns underlying program" do
+    tm = Teatest.new_test_model(M.new("a"))
+    begin
+      tm.get_program.should be(tm.program)
+    ensure
+      tm.quit
+    end
+  end
 end
 
 struct M

@@ -8,7 +8,7 @@ describe "Teatest app" do
       sleep 1.2.seconds
       tm.type("I'm typing things, but it'll be ignored by my program")
       tm.send("ignored msg")
-      tm.send(Tea.key(Tea::KeyType::Enter))
+      tm.send(Tea.key(Tea::KeyEnter))
 
       tm.quit
 
@@ -44,7 +44,7 @@ describe "Teatest app" do
         Teatest.with_check_interval(10.milliseconds),
       ])
 
-      tm.send(Tea.key(Tea::KeyType::Enter))
+      tm.send(Tea.key(Tea::KeyEnter))
       tm.quit
 
       final_model = tm.final_model

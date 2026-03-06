@@ -11,6 +11,5 @@ license: MIT
 dependencies:
   bubbletea:
     github: dsisnero/bubbletea.cr
-    branch: main
   golden:
     github: dsisnero/golden
