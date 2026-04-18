@@ -1,0 +1,66 @@
+# source_id	kind	status	crystal_refs	notes
+app_test.go::test::TestApp	test	missing	-	auto-generated
+app_test.go::test::TestAppInteractive	test	missing	-	auto-generated
+send_test.go::test::TestAppSendToOtherProgram	test	missing	-	auto-generated
+teatest.go::func::NewTestModel	func	ported	Teatest.new_test_model	ported from Go v1
+teatest.go::func::RequireEqualOutput	func	ported	Teatest.require_equal_output	ported from Go v1
+teatest.go::func::WaitFor	func	ported	Teatest.wait_for	ported from Go v1
+teatest.go::func::WithCheckInterval	func	ported	Teatest.with_check_interval	ported from Go v1
+teatest.go::func::WithDuration	func	ported	Teatest.with_duration	ported from Go v1
+teatest.go::func::WithFinalTimeout	func	ported	Teatest.with_final_timeout	ported from Go v1
+teatest.go::func::WithInitialTermSize	func	ported	Teatest.with_initial_term_size	ported from Go v1
+teatest.go::func::WithTimeoutFn	func	ported	Teatest.with_timeout_fn	ported from Go v1
+teatest.go::method::TestModel.FinalModel	method	missing	-	auto-generated
+teatest.go::method::TestModel.FinalOutput	method	missing	-	auto-generated
+teatest.go::method::TestModel.GetProgram	method	missing	-	auto-generated
+teatest.go::method::TestModel.Output	method	missing	-	auto-generated
+teatest.go::method::TestModel.Quit	method	missing	-	auto-generated
+teatest.go::method::TestModel.Send	method	missing	-	auto-generated
+teatest.go::method::TestModel.Type	method	missing	-	auto-generated
+teatest.go::method::TestModel.WaitFinished	method	missing	-	auto-generated
+teatest.go::method::safeReadWriter.Read	method	missing	-	auto-generated
+teatest.go::method::safeReadWriter.Write	method	missing	-	auto-generated
+teatest.go::struct::FinalOpts	struct	missing	-	auto-generated
+teatest.go::struct::TestModel	struct	missing	-	auto-generated
+teatest.go::struct::TestModelOptions	struct	missing	-	auto-generated
+teatest.go::struct::WaitingForContext	struct	missing	-	auto-generated
+teatest.go::type::FinalOpt	type	missing	-	auto-generated
+teatest.go::type::Program	type	missing	-	auto-generated
+teatest.go::type::TestOption	type	missing	-	auto-generated
+teatest.go::type::WaitForOption	type	missing	-	auto-generated
+teatest_test.go::test::TestWaitFinishedWithTimeoutFn	test	missing	-	auto-generated
+teatest_test.go::test::TestWaitForErrorReader	test	missing	-	auto-generated
+teatest_test.go::test::TestWaitForTimeout	test	missing	-	auto-generated
+v2/app_test.go::test::TestApp	test	missing	-	auto-generated
+v2/app_test.go::test::TestAppInteractive	test	missing	-	auto-generated
+v2/send_test.go::test::TestAppSendToOtherProgram	test	missing	-	auto-generated
+v2/teatest.go::func::NewTestModel	func	ported	Teatest.new_test_model	ported from Go v2
+v2/teatest.go::func::RequireEqualOutput	func	ported	Teatest.require_equal_output	ported from Go v2
+v2/teatest.go::func::WaitFor	func	ported	Teatest.wait_for	ported from Go v2
+v2/teatest.go::func::WithCheckInterval	func	ported	Teatest.with_check_interval	ported from Go v2
+v2/teatest.go::func::WithDuration	func	ported	Teatest.with_duration	ported from Go v2
+v2/teatest.go::func::WithFinalTimeout	func	ported	Teatest.with_final_timeout	ported from Go v2
+v2/teatest.go::func::WithInitialTermSize	func	ported	Teatest.with_initial_term_size	ported from Go v2
+v2/teatest.go::func::WithProgramOptions	func	ported	Teatest.with_program_options	ported from Go v2
+v2/teatest.go::func::WithTimeoutFn	func	ported	Teatest.with_timeout_fn	ported from Go v2
+v2/teatest.go::method::TestModel.FinalModel	method	ported	Teatest::TestModel#final_model	ported from Go v2
+v2/teatest.go::method::TestModel.FinalOutput	method	ported	Teatest::TestModel#final_output	ported from Go v2
+v2/teatest.go::method::TestModel.GetProgram	method	ported	Teatest::TestModel#get_program	ported from Go v2
+v2/teatest.go::method::TestModel.Output	method	ported	Teatest::TestModel#output	ported from Go v2
+v2/teatest.go::method::TestModel.Quit	method	ported	Teatest::TestModel#quit	ported from Go v2
+v2/teatest.go::method::TestModel.Send	method	ported	Teatest::TestModel#send	ported from Go v2
+v2/teatest.go::method::TestModel.Type	method	ported	Teatest::TestModel#type	ported from Go v2
+v2/teatest.go::method::TestModel.WaitFinished	method	ported	Teatest::TestModel#wait_finished	ported from Go v2
+v2/teatest.go::method::safeReadWriter.Read	method	ported	Teatest::SafeReadWriter#read	ported from Go v2
+v2/teatest.go::method::safeReadWriter.Write	method	ported	Teatest::SafeReadWriter#write	ported from Go v2
+v2/teatest.go::struct::FinalOpts	struct	ported	Teatest::FinalOpts	ported from Go v2
+v2/teatest.go::struct::TestModel	struct	ported	Teatest::TestModel	ported from Go v2
+v2/teatest.go::struct::TestModelOptions	struct	ported	Teatest::TestModelOptions	ported from Go v2
+v2/teatest.go::struct::WaitingForContext	struct	ported	Teatest::WaitingForContext	ported from Go v2
+v2/teatest.go::type::FinalOpt	type	ported	Teatest::FinalOpt	ported from Go v2
+v2/teatest.go::type::Program	type	ported	Teatest::Program	ported from Go v2
+v2/teatest.go::type::TestOption	type	ported	Teatest::TestOption	ported from Go v2
+v2/teatest.go::type::WaitForOption	type	ported	Teatest::WaitForOption	ported from Go v2
+v2/teatest_test.go::test::TestWaitFinishedWithTimeoutFn	test	missing	-	auto-generated
+v2/teatest_test.go::test::TestWaitForErrorReader	test	missing	-	auto-generated
+v2/teatest_test.go::test::TestWaitForTimeout	test	missing	-	auto-generated
