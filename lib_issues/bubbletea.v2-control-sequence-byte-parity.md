@@ -1,6 +1,7 @@
 Upstream issue: https://github.com/dsisnero/bubbletea.cr/issues/4
 Follow-up clarification comment: https://github.com/dsisnero/bubbletea.cr/issues/4#issuecomment-3969033733
 Self-contained in-repo repro comment: https://github.com/dsisnero/bubbletea.cr/issues/4#issuecomment-3969077692
+Renderer-source analysis comment: https://github.com/dsisnero/bubbletea.cr/issues/4#issuecomment-4149206686
 
 ## Summary
 `bubbletea.cr` output control sequences differ from Go Bubble Tea v2 output used by `x/exp/teatest/v2` golden fixtures. Functional behavior is correct, but strict byte-level golden parity fails for terminal prologue/epilogue and cursor/control sequences.
