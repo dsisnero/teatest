@@ -37,7 +37,7 @@ This file tracks parity status against Go source-of-truth in:
    - Crystal ultraviolet sends terminal capability queries: `ESC[?2026$p ESC[?2027$p` (request synchronized output mode and Unicode core mode)
    - Crystal enables modify other keys mode 2: `ESC[>4;2m`
    - Different cursor positioning: Crystal uses `ESC[30C` (cursor forward) vs Go's approach
-   
+
    These are `bubbletea.cr`/`ultraviolet` library differences, not `teatest` implementation issues. The teatest library correctly captures and compares Crystal Bubble Tea program output.
 
 2. **Parity tracking**: Added cross-language parity inventory system (`plans/inventory/`) with 65 items tracked, 35 marked as ported with Crystal references.
