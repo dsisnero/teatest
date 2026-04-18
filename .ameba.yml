@@ -31,7 +31,7 @@ Lint/MissingEnv:
 
 Lint/DebugCalls:
   Enabled: true
-  DebugMethods: ["p", "pp", "puts", "print"]
+  # DebugMethods: ["p", "pp", "puts", "print"]  # Removed: not supported in ameba 1.7.0-dev
 
 # Exclude vendor directory (upstream source)
 AllCops:
