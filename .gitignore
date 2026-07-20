@@ -18,6 +18,11 @@
 *.swp
 *.swo
 
+# Node.js (stray artifacts)
+/node_modules/
+/package.json
+/package-lock.json
+
 # OS files
 .DS_Store
 Thumbs.db

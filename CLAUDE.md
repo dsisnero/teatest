@@ -24,7 +24,7 @@ ameba
 
 # Run tests
 make test
-crystal spec -Dpreview_mt -Dexecution_context
+crystal spec
 
 # Clean temporary files
 make clean
@@ -65,7 +65,7 @@ Types: feat, fix, docs, refactor, test, chore, perf
 ```bash
 crystal tool format --check src spec
 ameba src spec
-crystal spec -Dpreview_mt -Dexecution_context
+crystal spec
 ```
 
 ## External Dependencies

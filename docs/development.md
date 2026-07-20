@@ -63,5 +63,5 @@
 ### Additional Useful Commands
 
 - **Run specific test file**: `crystal spec spec/teatest_spec.cr`
-- **Run with update flag**: `crystal spec -Dpreview_mt -Dexecution_context --update`
+- **Run with update flag**: `crystal spec --update`
 - **Check upstream Go tests**: `cd vendor/x/exp/teatest && go test ./v2 -v`

@@ -6,13 +6,13 @@
 # Run all tests
 make test
 # or
-crystal spec -Dpreview_mt -Dexecution_context
+crystal spec
 
 # Run specific test file
 crystal spec spec/teatest_spec.cr
 
 # Run with update flag (regenerate golden files)
-crystal spec -Dpreview_mt -Dexecution_context --update
+crystal spec --update
 ```
 
 ## Test Conventions

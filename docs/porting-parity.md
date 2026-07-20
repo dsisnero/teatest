@@ -53,5 +53,5 @@ cd vendor/x/exp/teatest && go test ./v2
 # Run Crystal quality gates
 crystal tool format --check src spec
 ameba src spec
-crystal spec -Dpreview_mt -Dexecution_context
+crystal spec
 ```
