@@ -72,6 +72,34 @@ describe Teatest do
       tm.quit
     end
   end
+
+  describe "golden wrappers" do
+    describe "show_snapshot" do
+      it "returns nil for missing snapshot" do
+        Teatest.show_snapshot("nonexistent.golden").should be_nil
+      end
+
+      it "returns content for existing snapshot" do
+        existing = Dir.glob("spec/testdata/*.golden").first
+        Teatest.show_snapshot(existing).should_not be_nil
+      end
+    end
+
+    describe "test_and_review!" do
+      it "returns error for failing command" do
+        result = Teatest.test_and_review!("false")
+        result.size.should eq 1
+        result[0][0].should eq "error"
+      end
+    end
+
+    describe "review!" do
+      it "returns empty when no pending snapshots" do
+        Golden.cleanup! # clean any stale pending files
+        Teatest.review!.should be_empty
+      end
+    end
+  end
 end
 
 struct M

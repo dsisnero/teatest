@@ -40,6 +40,36 @@ describe "Teatest" do
 end
 ```
 
+## Snapshot Management
+
+```bash
+# Show a golden snapshot
+Teatest.show_snapshot("spec/testdata/TestApp.golden")
+
+# Run tests then review pending snapshots
+Teatest.test_and_review!
+
+# List pending snapshots
+Teatest.review!
+```
+
+### Available Methods
+
+| Method | Description |
+|--------|-------------|
+| `show_snapshot(path)` | Read and return a golden file's content |
+| `test_and_review!(spec_cmd, snapshot_dir)` | Run specs, then review pending snapshots |
+| `review!(dir)` | List pending golden snapshots |
+
+## Updating Golden Files
+
+Set `GOLDEN_UPDATE=1` to regenerate golden files:
+```bash
+GOLDEN_UPDATE=1 crystal spec
+```
+
+Use `Golden.accept_all!` or `Golden.reject_all!` to manage pending snapshots.
+
 ## Coverage
 
 - **Coverage command**: Not currently configured (TODO: add simplecov)

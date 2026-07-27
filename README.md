@@ -69,6 +69,7 @@ tm.quit
 ## Features
 
 - **Golden file testing**: Compare output with expected golden files
+- **Snapshot management**: Review and manage pending golden snapshots
 - **Async testing**: Wait for specific output patterns
 - **Term2 integration**: Test Bubble Tea applications
 - **Go parity**: Behavior matches upstream Go `x/exp/teatest/v2`

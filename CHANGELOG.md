@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2026-07-27
+
+- Added `show_snapshot` to read golden snapshot files
+- Added `test_and_review!` to run specs then review pending snapshots
+- Added `review!` to list pending golden snapshots
+
 ## [0.1.0] - 2026-02-10
 
 - Initial Crystal port of `x/exp/teatest/v2`.

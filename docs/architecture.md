@@ -32,7 +32,10 @@ teatest/
 - **`Teatest`**: Main test framework module
   - `TestModel`: Wrapper for Term2 models under test
   - `Program`: Test program interface
-  - Golden file comparison utilities
+  - `require_equal_output`: Golden file comparison
+  - `show_snapshot`: Read golden snapshot content
+  - `test_and_review!`: Run specs then review pending snapshots
+  - `review!`: List pending golden snapshots
 
 - **`Term2`**: Bubble Tea framework (external dependency via `bubbletea.cr`)
   - Provides the Model/Update/View pattern for terminal applications

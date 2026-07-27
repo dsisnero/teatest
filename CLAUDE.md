@@ -42,6 +42,29 @@ rm -rf ./temp/*
 | [PR Workflow](docs/pr-workflow.md) | Commits, PRs, branch naming, review process |
 | [Porting Parity](docs/porting-parity.md) | Upstream source mapping, behavior parity, test translation |
 
+## Public API
+
+```crystal
+# Test model lifecycle
+tm = Teatest.new_test_model(model, options)
+tm.send(msg)
+tm.type("text")
+tm.output          # IO reader for current output
+tm.final_output    # wait for completion, get full output
+tm.final_model     # wait for completion, get final model
+tm.wait_finished   # wait for program exit
+tm.quit
+
+# Assertions
+Teatest.wait_for(output_io, ->condition(Bytes))
+Teatest.require_equal_output(test_name, output_bytes)
+
+# Snapshot management
+Teatest.show_snapshot(path)            # read golden file
+Teatest.test_and_review!(spec_cmd)     # run specs then review
+Teatest.review!                        # list pending snapshots
+```
+
 ## Core Principles
 
 1. Upstream Go code (vendor/x/exp/teatest/v2) is the source of truth

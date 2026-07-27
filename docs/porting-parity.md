@@ -1,6 +1,6 @@
 ---
 upstream_repo: "https://github.com/charmbracelet/ansi"
-pinned_revision: "{{pinned_revision}}"
+pinned_revision: "bb9a970"
 import_mode: "submodule"
 upstream_submodule_path: "vendor/x/exp/teatest/v2"
 ---
@@ -18,10 +18,10 @@ upstream_submodule_path: "vendor/x/exp/teatest/v2"
 
 | Upstream Module/Path | Crystal Target | Status | Notes |
 |----------------------|----------------|--------|-------|
-| `teatest.go` | `src/teatest.cr` | Ported | Main implementation |
-| `teatest_test.go` | `spec/teatest_spec.cr` | Partial | Tests being ported |
-| `app_test.go` | `spec/app_spec.cr` | Partial | App tests being ported |
-| `send_test.go` | `spec/send_spec.cr` | Partial | Send tests being ported |
+| `teatest.go` | `src/teatest.cr` | Ported | Main implementation + golden snapshot wrappers |
+| `teatest_test.go` | `spec/teatest_spec.cr` | Ported | Tests ported |
+| `app_test.go` | `spec/app_spec.cr` | Ported | App tests ported (golden files need update) |
+| `send_test.go` | `spec/send_spec.cr` | Ported | Send tests ported (golden files need update) |
 | `testdata/` | `spec/testdata/` | Copied | Golden files copied from upstream |
 
 ## Behavior Checklist
