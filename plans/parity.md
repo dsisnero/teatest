@@ -37,8 +37,8 @@ duplicate it here.
   - The source root is `vendor/x/exp/teatest/v2`, not the parent directory:
     `vendor/x/exp/teatest/*.go` still holds the v1 files with the same names.
   - The curated ledger uses the `regex` discovery vocabulary
-    (`func`/`method`/`struct`/`type`), so pin `PORT_PARSER=regex` until the
-    tree-sitter migration is reviewed.
+    (`func`/`method`/`struct`/`type`), so pin `PORT_PARSER=regex`; the
+    tree-sitter candidate was reviewed and deferred (assessment below).
   - A send-only failure whose two outputs differ solely in the position of
     `ESC[?2026$p ESC[?2027$p` is this dependency race, not golden drift. Do not
     "fix" it by normalizing the fixture.
@@ -46,13 +46,13 @@ duplicate it here.
   - `bubbletea.cr`/`ultraviolet` emit terminal capability queries
     (`ESC[?2026$p`, `ESC[?2027$p`) and modify-other-keys mode
     (`ESC[>4;2m`) that Go does not, which is the source of golden drift.
-- **Last feature commit:** `dbad171` (`chore(parity): adopt canonical parity
-  tooling and review golden fixtures`); previous feature `5545ced`
-  (`feat(teatest): add show_snapshot, test_and_review!, review! wrappers`)
+- **Last feature commit:** `dd0267c` (`chore(parity): validate ledger refs as
+  symbols and rehome shard bug reports`); earlier `dbad171` (parity tooling
+  adoption) and `5545ced` (snapshot wrappers)
 - **Gates:** `make format` pass; `make lint` pass; `make test` 12 examples,
   0 failures on 4 of 5 runs (1 send flake, above); `make inventory` pass
-  (27 items tracked, backend `regex`, Crystal symbols validated); upstream
-  `go test ./...` in `vendor/x/exp/teatest/v2` pass.
+  (27 items tracked, backend `regex`, Crystal symbols validated); adversarial
+  signoff pass (`crystal spec` + upstream `go test ./...`).
 
 Keep this block accurate after every feature: the next session reads it first
 (see [AGENTS.md](../AGENTS.md) → **How to resume**).
