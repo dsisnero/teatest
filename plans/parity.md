@@ -86,16 +86,17 @@ duplicate it here.
     golden compare fails.
   - `.golden.new` (pending review) and `*.golden.meta` (golden metadata) are
     artifacts, not fixtures; never commit them.
-- **Last feature commit:** `c8e0883` (`chore(deps): track bubbletea main and
-  refresh the goldens`); before that `2ba58d7` (determinism), `df0483a` (CI
-  input fix), `ff44b6b` (CI workflow), `b020c55` (review helpers), `0af8267`
+- **Last feature commit:** `cd2227f` (`chore(parity): migrate the ledger to
+  tree-sitter ids`) plus `c719250` (CI tree-sitter runtime); before that
+  `c8e0883` (bubbletea main), `2ba58d7` (determinism), `ff44b6b` (CI workflow)
 - **Gates:** `make format` pass; `make lint` pass; `make test` 14 examples,
   0 failures on 5 consecutive runs after the `bubbletea` `main` refresh;
   `make inventory` pass (31 items tracked, backend `chiasmus-tree-sitter`,
   Crystal symbols validated); kind-vocabulary scan reports no drops;
   clean-room CI simulation pass end-to-end; parity preflight
   `PARITY_SKILL_VERIFIED=1`; GitHub `CI` runs `45567742970`, `45568077827`,
-  and `45568476812` success.
+  `45568476812`, `45570459526`, and `45577329581` success (the last confirms
+  backend `chiasmus-tree-sitter` and 31 items on the runner).
 
 Keep this block accurate after every feature: the next session reads it first
 (see [AGENTS.md](../AGENTS.md) → **How to resume**).
