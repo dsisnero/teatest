@@ -85,13 +85,15 @@ duplicate it here.
     golden compare fails.
   - `.golden.new` (pending review) and `*.golden.meta` (golden metadata) are
     artifacts, not fixtures; never commit them.
-- **Last feature commit:** `ff44b6b` (`feat(ci): run the format, lint, test,
-  and parity gates on push and PR`); before that `b020c55` (review helpers),
-  `0af8267` (send_spec settle), `44101b0`, `dd0267c`
+- **Last feature commit:** `2ba58d7` (`fix(teatest): pin the test program
+  environment so goldens are deterministic`); before that `ff44b6b` (CI
+  workflow), `b020c55` (review helpers), `0af8267` (send_spec settle),
+  `44101b0`, `dd0267c`
 - **Gates:** `make format` pass; `make lint` pass; `make test` 14 examples,
-  0 failures on 10/10 runs; `make inventory` pass (27 items tracked, backend
-  `regex`, Crystal symbols validated); clean-room CI simulation pass; parity
-  preflight `PARITY_SKILL_VERIFIED=1`.
+  0 failures on 13 consecutive runs (5 of them with `TERM` unset);
+  `make inventory` pass (27 items tracked, backend `regex`, Crystal symbols
+  validated); clean-room CI simulation pass end-to-end; parity preflight
+  `PARITY_SKILL_VERIFIED=1`.
 
 Keep this block accurate after every feature: the next session reads it first
 (see [AGENTS.md](../AGENTS.md) → **How to resume**).
