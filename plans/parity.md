@@ -55,9 +55,9 @@ duplicate it here.
   - `bubbletea.cr`/`ultraviolet` emit terminal capability queries
     (`ESC[?2026$p`, `ESC[?2027$p`) and modify-other-keys mode
     (`ESC[>4;2m`) that Go only emits in a querying environment.
-- **Last feature commit:** `44101b0` (`docs(lib_issues): number shard bug
-  reports and mark fixed ones`); earlier `dd0267c` (ledger symbol refs) and
-  `dbad171` (parity tooling adoption)
+- **Last feature commit:** `0af8267` (`port: stabilize send_spec around the
+  capability-query boundary`); earlier `44101b0` (numbered shard reports) and
+  `dd0267c` (ledger symbol refs)
 - **Gates:** `make format` pass; `make lint` pass; `make test` 12 examples,
   0 failures on 10 of 10 runs; `make inventory` pass (27 items tracked, backend
   `regex`, Crystal symbols validated); adversarial signoff pass (`crystal spec`
