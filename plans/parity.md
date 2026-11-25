@@ -90,17 +90,18 @@ duplicate it here.
     golden compare fails.
   - `.golden.new` (pending review) and `*.golden.meta` (golden metadata) are
     artifacts, not fixtures; never commit them.
-- **Last feature commit:** `cd2227f` (`chore(parity): migrate the ledger to
-  tree-sitter ids`) plus `c719250` (CI tree-sitter runtime); before that
+- **Last feature commit:** `1bf4e6c` (`chore(vendor): bump charmbracelet/x to
+  8aab43e`); before that `cd2227f` (tree-sitter ledger), `c719250` (CI runtime),
   `c8e0883` (bubbletea main), `2ba58d7` (determinism), `ff44b6b` (CI workflow)
 - **Gates:** `make format` pass; `make lint` pass; `make test` 14 examples,
   0 failures on 5 consecutive runs after the `bubbletea` `main` refresh;
   `make inventory` pass (31 items tracked, backend `chiasmus-tree-sitter`,
   Crystal symbols validated); kind-vocabulary scan reports no drops;
   clean-room CI simulation pass end-to-end; parity preflight
-  `PARITY_SKILL_VERIFIED=1`; GitHub `CI` runs `45567742970`, `45568077827`,
-  `45568476812`, `45570459526`, and `45577329581` success (the last confirms
-  backend `chiasmus-tree-sitter` and 31 items on the runner).
+  `PARITY_SKILL_VERIFIED=1`; upstream `go test ./...` in `v2` pass; GitHub `CI`
+  runs `45567742970`, `45568077827`, `45568476812`, `45570459526`,
+  `45577329581`, and `45578845668` success (the last covers the `8aab43e` bump
+  and the tree-sitter gate).
 
 Keep this block accurate after every feature: the next session reads it first
 (see [AGENTS.md](../AGENTS.md) → **How to resume**).
