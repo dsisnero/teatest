@@ -21,6 +21,10 @@ crystal spec --update
 - **Golden files**: Located in `spec/testdata/` with `.golden` extension
 - **Test structure**: Use `Spec` framework with `describe`/`it` blocks
 - **Porting tests**: Translate Go tests from `vendor/x/exp/teatest/v2/*_test.go`
+- **Environment**: the rendering fixtures contain the terminal capability
+  queries Bubble Tea emits when `TERM` looks interactive. Run the suite with a
+  real `TERM` (CI uses `TERM=xterm-256color`); under `env -i` without `TERM`
+  the app goldens mismatch because those queries are skipped.
 
 ## Writing Tests
 

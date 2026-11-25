@@ -72,6 +72,35 @@
 - **Check upstream Go tests**: `cd vendor/x/exp/teatest && go test ./v2 -v`
 - **Strict parity preflight**: `"$PARITY_SKILL_DIR/scripts/verify_skill_install.sh" . go regex`
 
+## Continuous Integration
+
+[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs the four gates on
+every push to `main` and every pull request:
+
+| Step | Command | Notes |
+|------|---------|-------|
+| Checkout | `actions/checkout` with `submodules: recursive` | `vendor/x` is the upstream submodule |
+| Install Crystal | `crystal-lang/install-crystal` | pinned to the compiler that accepted the fixtures (1.22.3) |
+| Install shards | `shards install` | no lock is committed, so dependencies float |
+| Format | `make format` | |
+| Lint | `crystal build lib/ameba/src/cli.cr -o bin/ameba`, then `PATH="$PWD/bin:$PATH" make lint` | ameba ships a `targets:` entry, not `executables:`, so `shards install` does not put it on `PATH` |
+| Test | `make test` | needs `TERM=xterm-256color` (see below) |
+| Parity | clone `dsisnero/crystal_forge`, run `verify_skill_install.sh . go regex`, then `make inventory` | the gate forwards to that skill; it is not vendored here |
+
+The workflow pins `TERM=xterm-256color` for the whole job. Bubble Tea only emits
+the terminal capability queries (DECRQM 2026/2027) when `TERM` looks
+interactive, and the accepted goldens contain those bytes, so an environment
+without `TERM` fails every rendering fixture. Locally, reproducing a CI failure
+means running the specs under a minimal environment:
+
+```bash
+env -i HOME="$HOME" PATH="$PATH" TERM=xterm-256color crystal spec
+```
+
+Because dependencies float, a green local suite with an older `lib/` does not
+guarantee a green CI run; `shards update` locally first, and treat a new
+rendering mismatch as fixture review rather than a CI bug.
+
 ## Project Structure and Porting Notes
 
 - `src/teatest.cr` — the whole library; mirrors `vendor/x/exp/teatest/v2/teatest.go`.

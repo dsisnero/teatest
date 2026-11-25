@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Terminal capability queries (DECRQM 2026/2027) are emitted only when `TERM`
+# looks interactive, and the accepted golden fixtures include those bytes.
+# A bare runner has no `TERM`, so pin it for the whole job.
+env:
+  TERM: xterm-256color
+
+jobs:
+  gates:
+    name: format, lint, test, parity
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout (with vendored upstream)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # Pinned to the compiler used to accept the current golden fixtures.
+      # Shards still float (see plans/parity.md, dependency policy).
+      - name: Install Crystal
+        uses: crystal-lang/install-crystal@v1
+        with:
+          crystal-version: 1.22.3
+
+      - name: Install shards
+        run: shards install
+
+      - name: Check formatting
+        run: make format
+
+      # ameba ships a `targets:` entry rather than `executables:`, so
+      # `shards install` does not put it on PATH; build the locked version.
+      - name: Build ameba
+        run: |
+          mkdir -p bin
+          crystal build lib/ameba/src/cli.cr -o bin/ameba
+
+      - name: Lint
+        run: PATH="$PWD/bin:$PATH" make lint
+
+      - name: Test
+        run: make test
+
+      # The parity gate forwards to the installed cross-language-crystal-parity
+      # skill, which is not vendored here; fetch it the same way a workstation
+      # install does and point PARITY_SKILL_DIR at it.
+      - name: Parity preflight and inventory
+        env:
+          PARITY_SKILL_DIR: ${{ runner.temp }}/crystal_forge/skills/cross-language-crystal-parity
+        run: |
+          git clone --depth 1 https://github.com/dsisnero/crystal_forge.git "${RUNNER_TEMP}/crystal_forge"
+          "${PARITY_SKILL_DIR}/scripts/verify_skill_install.sh" . go regex
+          make inventory
