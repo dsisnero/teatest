@@ -1,3 +1,6 @@
+Upstream issue: https://github.com/dsisnero/bubbletea.cr/issues/2
+Status: fixed; closed 2026-02-26.
+
 ## Summary
 Programs created with non-TTY input/output (for tests) fail with `not a terminal` because `Tea::Program#init_input` unconditionally calls `Console#make_raw`. Expected Go parity: `WithInput(IO)` + `WithOutput(IO)` should work for teatest-style non-terminal buffers.
 

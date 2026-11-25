@@ -1,3 +1,6 @@
+Upstream issue: https://github.com/dsisnero/bubbletea.cr/issues/1
+Status: fixed; closed 2026-02-26.
+
 ## Summary
 `bubbletea.cr` fails to compile because default arguments reference `Ultraviolet::KeyMod::None`, but `Ultraviolet::KeyMod` is an `Int32` alias (no `None` constant). Expected: shard compiles with `require "bubbletea"`. Actual: compile-time constant resolution error.
 

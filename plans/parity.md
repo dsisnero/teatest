@@ -11,10 +11,10 @@ duplicate it here.
   differ only in where `bubbletea.cr` flushes its startup capability queries
   (`ESC[?2026$p ESC[?2027$p`), so `out1.should eq out2` and the golden compare
   fail in roughly 1 of 5 full-suite runs. Root cause and repro:
-  [lib_issues/bubbletea.capability-query-race.md](../lib_issues/bubbletea.capability-query-race.md).
+  [lib_issues/bubbletea.5.md](../lib_issues/bubbletea.5.md).
 - **Next up:**
   1. Track
-     [lib_issues/bubbletea.capability-query-race.md](../lib_issues/bubbletea.capability-query-race.md)
+     [lib_issues/bubbletea.5.md](../lib_issues/bubbletea.5.md)
      upstream; when it lands, re-run the send spec 5× and flip the ledger row
      to `ported`. Do not patch `lib/`.
   2. Treat the tree-sitter ledger migration as a dedicated reviewed change
@@ -101,7 +101,7 @@ Keep this block accurate after every feature: the next session reads it first
 ## Phase 5 — Dependency alignment
 
 - [ ] Fix the `bubbletea.cr` capability-query ordering race
-      ([lib_issues/bubbletea.capability-query-race.md](../lib_issues/bubbletea.capability-query-race.md))
+      ([lib_issues/bubbletea.5.md](../lib_issues/bubbletea.5.md))
       and make the send spec deterministic
 
 ## Tree-sitter candidate assessment (2026-11-24)
