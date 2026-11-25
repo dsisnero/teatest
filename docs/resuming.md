@@ -43,13 +43,14 @@ Format, lint, and inventory must pass before changing anything. `make test`
 passes most runs; the known exception is `TestAppSendToOtherProgram`, which can
 fail when the two programs' capability-query bytes land in different positions.
 That is the top item in the plan's **Next up** list
-([lib_issues/bubbletea.capability-query-race.md](../lib_issues/bubbletea.capability-query-race.md)),
+([shards_issues/bubbletea.5.md](../shards_issues/bubbletea.5.md)),
 not golden drift — do not normalize the fixture to hide it.
 
 `make inventory` forwards to the installed cross-language parity skill and
-prints `PARITY_DISCOVERY_BACKEND=regex`. The ledger was built with the regex
-vocabulary, so do not switch the parser without the reviewed migration in
-[plans/parity.md](../plans/parity.md).
+prints `PARITY_DISCOVERY_BACKEND=regex`. It also validates `crystal_refs`
+symbols against `src` (`PORT_CRYSTAL_SOURCE=src`), so a renamed method fails the
+gate. The ledger was built with the regex vocabulary, so do not switch the
+parser without the reviewed migration in [plans/parity.md](../plans/parity.md).
 
 Optional strict preflight (checks the skill wrappers are executable):
 

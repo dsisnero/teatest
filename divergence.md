@@ -56,7 +56,7 @@ status: [plans/inventory/go_port_inventory.tsv](plans/inventory/go_port_inventor
    output. `TestAppSendToOtherProgram` remains flaky because `bubbletea.cr`
    flushes its startup capability queries through the renderer buffer, so their
    position relative to shutdown varies between programs; see
-   [lib_issues/bubbletea.capability-query-race.md](lib_issues/bubbletea.capability-query-race.md)
+   [shards_issues/bubbletea.5.md](shards_issues/bubbletea.5.md)
    and [plans/parity.md](plans/parity.md).
 
 2. **No Go `testing.TB`**: Crystal does not expose it directly. The port ships

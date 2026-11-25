@@ -1,36 +1,36 @@
 # source_id	kind	status	crystal_refs	notes
 # baseline=github.com/charmbracelet/x/exp/teatest/v2 @ bb9a97036f23256d4201bd73255ca9bd0d2c92f1 (vendor/x/exp/teatest/v2)
 # kinds=func,method,struct,type,test
-teatest.go::func::NewTestModel	func	ported	src/teatest.cr	Teatest.new_test_model
-teatest.go::func::RequireEqualOutput	func	ported	src/teatest.cr	Teatest.require_equal_output
-teatest.go::func::WaitFor	func	ported	src/teatest.cr	Teatest.wait_for
-teatest.go::func::WithCheckInterval	func	ported	src/teatest.cr	Teatest.with_check_interval
-teatest.go::func::WithDuration	func	ported	src/teatest.cr	Teatest.with_duration
-teatest.go::func::WithFinalTimeout	func	ported	src/teatest.cr	Teatest.with_final_timeout
-teatest.go::func::WithInitialTermSize	func	ported	src/teatest.cr	Teatest.with_initial_term_size
-teatest.go::func::WithProgramOptions	func	ported	src/teatest.cr	Teatest.with_program_options
-teatest.go::func::WithTimeoutFn	func	ported	src/teatest.cr	Teatest.with_timeout_fn
-teatest.go::method::TestModel.FinalModel	method	ported	src/teatest.cr	Teatest::TestModel#final_model
-teatest.go::method::TestModel.FinalOutput	method	ported	src/teatest.cr	Teatest::TestModel#final_output
-teatest.go::method::TestModel.GetProgram	method	ported	src/teatest.cr	Teatest::TestModel#get_program
-teatest.go::method::TestModel.Output	method	ported	src/teatest.cr	Teatest::TestModel#output
-teatest.go::method::TestModel.Quit	method	ported	src/teatest.cr	Teatest::TestModel#quit
-teatest.go::method::TestModel.Send	method	ported	src/teatest.cr	Teatest::TestModel#send
-teatest.go::method::TestModel.Type	method	ported	src/teatest.cr	Teatest::TestModel#type
-teatest.go::method::TestModel.WaitFinished	method	ported	src/teatest.cr	Teatest::TestModel#wait_finished
-teatest.go::method::safeReadWriter.Read	method	ported	src/teatest.cr	Teatest::SafeReadWriter#read
-teatest.go::method::safeReadWriter.Write	method	ported	src/teatest.cr	Teatest::SafeReadWriter#write
-teatest.go::struct::FinalOpts	struct	ported	src/teatest.cr	Teatest::FinalOpts
-teatest.go::struct::TestModel	struct	ported	src/teatest.cr	Teatest::TestModel
-teatest.go::struct::TestModelOptions	struct	ported	src/teatest.cr	Teatest::TestModelOptions
-teatest.go::struct::WaitingForContext	struct	ported	src/teatest.cr	Teatest::WaitingForContext
-teatest.go::type::FinalOpt	type	ported	src/teatest.cr	Teatest::FinalOpt
-teatest.go::type::Program	type	ported	src/teatest.cr	Teatest::Program
-teatest.go::type::TestOption	type	ported	src/teatest.cr	Teatest::TestOption
-teatest.go::type::WaitForOption	type	ported	src/teatest.cr	Teatest::WaitForOption
+teatest.go::func::NewTestModel	func	ported	src/teatest.cr::func::new_test_model	Teatest.new_test_model
+teatest.go::func::RequireEqualOutput	func	ported	src/teatest.cr::func::require_equal_output	Teatest.require_equal_output
+teatest.go::func::WaitFor	func	ported	src/teatest.cr::func::wait_for	Teatest.wait_for
+teatest.go::func::WithCheckInterval	func	ported	src/teatest.cr::func::with_check_interval	Teatest.with_check_interval
+teatest.go::func::WithDuration	func	ported	src/teatest.cr::func::with_duration	Teatest.with_duration
+teatest.go::func::WithFinalTimeout	func	ported	src/teatest.cr::func::with_final_timeout	Teatest.with_final_timeout
+teatest.go::func::WithInitialTermSize	func	ported	src/teatest.cr::func::with_initial_term_size	Teatest.with_initial_term_size
+teatest.go::func::WithProgramOptions	func	ported	src/teatest.cr::func::with_program_options	Teatest.with_program_options
+teatest.go::func::WithTimeoutFn	func	ported	src/teatest.cr::func::with_timeout_fn	Teatest.with_timeout_fn
+teatest.go::method::TestModel.FinalModel	method	ported	src/teatest.cr::method::final_model	Teatest::TestModel#final_model
+teatest.go::method::TestModel.FinalOutput	method	ported	src/teatest.cr::method::final_output	Teatest::TestModel#final_output
+teatest.go::method::TestModel.GetProgram	method	ported	src/teatest.cr::method::get_program	Teatest::TestModel#get_program
+teatest.go::method::TestModel.Output	method	ported	src/teatest.cr::method::output	Teatest::TestModel#output
+teatest.go::method::TestModel.Quit	method	ported	src/teatest.cr::method::quit	Teatest::TestModel#quit
+teatest.go::method::TestModel.Send	method	ported	src/teatest.cr::method::send	Teatest::TestModel#send
+teatest.go::method::TestModel.Type	method	ported	src/teatest.cr::method::type	Teatest::TestModel#type
+teatest.go::method::TestModel.WaitFinished	method	ported	src/teatest.cr::method::wait_finished	Teatest::TestModel#wait_finished
+teatest.go::method::safeReadWriter.Read	method	ported	src/teatest.cr::method::read	Teatest::SafeReadWriter#read
+teatest.go::method::safeReadWriter.Write	method	ported	src/teatest.cr::method::write	Teatest::SafeReadWriter#write
+teatest.go::struct::FinalOpts	struct	ported	src/teatest.cr::class::FinalOpts	Teatest::FinalOpts
+teatest.go::struct::TestModel	struct	ported	src/teatest.cr::class::TestModel	Teatest::TestModel
+teatest.go::struct::TestModelOptions	struct	ported	src/teatest.cr::class::TestModelOptions	Teatest::TestModelOptions
+teatest.go::struct::WaitingForContext	struct	ported	src/teatest.cr::class::WaitingForContext	Teatest::WaitingForContext
+teatest.go::type::FinalOpt	type	ported	src/teatest.cr	Teatest::FinalOpt (alias; not discovered by regex vocabulary)
+teatest.go::type::Program	type	ported	src/teatest.cr::module::Program	Teatest::Program
+teatest.go::type::TestOption	type	ported	src/teatest.cr	Teatest::TestOption (alias; not discovered by regex vocabulary)
+teatest.go::type::WaitForOption	type	ported	src/teatest.cr	Teatest::WaitForOption (alias; not discovered by regex vocabulary)
 app_test.go::test::TestApp	test	ported	spec/app_spec.cr	spec + golden accepted (Crystal output ordering)
 app_test.go::test::TestAppInteractive	test	ported	spec/app_spec.cr	spec ported
-send_test.go::test::TestAppSendToOtherProgram	test	partial	spec/send_spec.cr	flaky: bubbletea.cr capability-query ordering (lib_issues/bubbletea.capability-query-race.md)
+send_test.go::test::TestAppSendToOtherProgram	test	partial	spec/send_spec.cr	flaky: bubbletea.cr capability-query ordering (shards_issues/bubbletea.5.md)
 teatest_test.go::test::TestWaitFinishedWithTimeoutFn	test	ported	spec/teatest_spec.cr	spec ported
 teatest_test.go::test::TestWaitForErrorReader	test	ported	spec/teatest_spec.cr	spec ported
 teatest_test.go::test::TestWaitForTimeout	test	ported	spec/teatest_spec.cr	spec ported

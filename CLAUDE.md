@@ -81,9 +81,13 @@ behavior changes.
 
 The curated ledger (`plans/inventory/go_port_inventory.tsv`) uses the `regex`
 discovery vocabulary, so the gate pins `PORT_PARSER=regex` (`PARITY_PARSER` in
-the `Makefile`). Keep that mode until the tree-sitter migration in
-`plans/parity.md` is reviewed: a requested parser mode does not prove which
-extractor ran, so confirm `PARITY_DISCOVERY_BACKEND` in the gate output.
+the `Makefile`). `make inventory` also sets `PORT_CRYSTAL_SOURCE=src`, so
+`crystal_refs` entries written as `path::kind::name` are validated against
+Crystal discovery; use that form for new refs (file-only refs are reserved for
+Crystal `alias` types, which the regex vocabulary does not discover). Keep the
+parser mode until the tree-sitter migration in `plans/parity.md` is reviewed: a
+requested parser mode does not prove which extractor ran, so confirm
+`PARITY_DISCOVERY_BACKEND` in the gate output.
 
 ```bash
 PARITY_SKILL_DIR="${PARITY_SKILL_DIR:-$HOME/.agents/skills/crystal_forge/skills/cross-language-crystal-parity}"
@@ -182,3 +186,7 @@ Common issues:
 - **Type naming**: CamelCase for classes/modules; snake_case for methods.
 - **Tooling hygiene**: parity scripts forward to the installed skill; never
   copy its Ruby implementation into `scripts/`.
+- **Dependency bugs**: never patch `lib/` in place. Write a numbered report in
+  `shards_issues/<shard>.<upstream-issue-number>.md` (for example
+  `shards_issues/bubbletea.5.md`) with summary, environment, reproduction,
+  actual/expected, root cause, and proposed fix.

@@ -24,7 +24,7 @@ test: sidecars
 # Drift check for the curated parity ledger. Forwards to the installed
 # cross-language-crystal-parity skill; see AGENTS.md -> Parity tooling.
 inventory:
-	PORT_PARSER=$(PARITY_PARSER) ./scripts/check_port_inventory.sh \
+	PORT_PARSER=$(PARITY_PARSER) PORT_CRYSTAL_SOURCE=src ./scripts/check_port_inventory.sh \
 		"$(CURDIR)" "$(PARITY_LEDGER)" "$(PARITY_SOURCE)" "$(PARITY_LANGUAGE)"
 
 # Intentional upstream bump only: regenerate the source/test manifests.

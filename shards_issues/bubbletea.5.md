@@ -1,3 +1,8 @@
+Shard: `bubbletea` 2.0.8 ([dsisnero/bubbletea.cr](https://github.com/dsisnero/bubbletea.cr))
+Upstream issue: pending — next free number is
+https://github.com/dsisnero/bubbletea.cr/issues/5 (renumber this file if the
+issue lands differently).
+
 ## Summary
 `bubbletea.cr` emits its startup terminal capability queries
 (`ESC[?2026$p` + `ESC[?2027$p`) through the renderer's `@output_buf`, so their

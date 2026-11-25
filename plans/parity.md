@@ -11,19 +11,13 @@ duplicate it here.
   differ only in where `bubbletea.cr` flushes its startup capability queries
   (`ESC[?2026$p ESC[?2027$p`), so `out1.should eq out2` and the golden compare
   fail in roughly 1 of 5 full-suite runs. Root cause and repro:
-  [lib_issues/bubbletea.capability-query-race.md](../lib_issues/bubbletea.capability-query-race.md).
+  [shards_issues/bubbletea.5.md](../shards_issues/bubbletea.5.md).
 - **Next up:**
-  1. Fix the capability-query ordering upstream in `dsisnero/bubbletea.cr`
-     (or carry a reviewed local shard patch via `crystal-shard-lib-patch`),
-     then make the send spec pass 5/5 runs.
-  2. Migrate ledger `crystal_refs` from file paths to
-     `path::kind::name` symbol refs with the canonical
-     `migrate_crystal_refs.py` (`--crystal-source src`) so renames inside
-     `src/teatest.cr` are caught.
-  3. Evaluate a tree-sitter ledger migration: generate a native candidate,
-     audit `definition.type` captures and duplicates, and only then switch
-     `PARITY_PARSER` in a reviewed commit.
-  4. On an upstream bump, refresh the manifests with `make parity-refresh` and
+  1. Track `shards_issues/bubbletea.5.md` upstream; when it lands, re-run the
+     send spec 5× and flip the ledger row to `ported`. Do not patch `lib/`.
+  2. Treat the tree-sitter ledger migration as a dedicated reviewed change
+     (assessment below); it is not worth interrupting the current ledger.
+  3. On an upstream bump, refresh the manifests with `make parity-refresh` and
      write a `plans/inventory/v<NN>_delta_triage.tsv` for that release.
 - **Status by area:**
   - Core functions (`teatest.go`): 9/9 ported.
@@ -34,6 +28,9 @@ duplicate it here.
     ported but flaky on the dependency race above.
   - Golden fixtures: `TestApp` accepted against current Crystal output; send
     fixture current but the spec around it is racy.
+  - Ledger refs: 24/27 symbol-validated (`path::kind::name`); the three
+    Crystal `alias` types keep file refs because the regex vocabulary does not
+    discover aliases.
   - Snapshot review helpers (`show_snapshot`, `test_and_review!`, `review!`):
     Crystal-only extension, divergence documented.
 - **Scoping notes / gotchas:**
@@ -54,8 +51,8 @@ duplicate it here.
   (`feat(teatest): add show_snapshot, test_and_review!, review! wrappers`)
 - **Gates:** `make format` pass; `make lint` pass; `make test` 12 examples,
   0 failures on 4 of 5 runs (1 send flake, above); `make inventory` pass
-  (27 items tracked, backend `regex`); upstream `go test ./...` in
-  `vendor/x/exp/teatest/v2` pass.
+  (27 items tracked, backend `regex`, Crystal symbols validated); upstream
+  `go test ./...` in `vendor/x/exp/teatest/v2` pass.
 
 Keep this block accurate after every feature: the next session reads it first
 (see [AGENTS.md](../AGENTS.md) → **How to resume**).
@@ -93,14 +90,33 @@ Keep this block accurate after every feature: the next session reads it first
 
 - [x] Rebase the ledger on the v2 baseline and drop duplicate v1 rows
 - [x] Forward parity scripts to the installed canonical skill
-- [ ] Migrate `crystal_refs` to symbol refs
-- [ ] Review the tree-sitter migration candidate
+- [x] Migrate `crystal_refs` to symbol refs and validate them with
+      `PORT_CRYSTAL_SOURCE=src` (Crystal `alias` types keep file refs until the
+      tree-sitter vocabulary is adopted)
+- [x] Review the tree-sitter migration candidate (assessment below)
+- [ ] Migrate the ledger to tree-sitter ids as a dedicated reviewed change
 
 ## Phase 5 — Dependency alignment
 
 - [ ] Fix the `bubbletea.cr` capability-query ordering race
-      ([lib_issues/bubbletea.capability-query-race.md](../lib_issues/bubbletea.capability-query-race.md))
+      ([shards_issues/bubbletea.5.md](../shards_issues/bubbletea.5.md))
       and make the send spec deterministic
+
+## Tree-sitter candidate assessment (2026-11-24)
+
+Generated a native candidate for `vendor/x/exp/teatest/v2` with
+`PORT_PARSER=tree-sitter` (backend `chiasmus-tree-sitter`, toolchain v0.3.4):
+
+- 31 declarations vs 27 in the regex ledger.
+- Every id changes kind: `func` → `function`, `struct` → `class`,
+  `type::Program` → `interface::Program`.
+- Adds four internal declarations the regex extractor skips: `safe`,
+  `doWaitFor`, `safeReadWriter`, `waitDone`.
+- No `definition.type` rows; the kind-vocabulary gate reports no drops.
+
+Decision: keep `PORT_PARSER=regex` and the current ledger. Migrating would
+rewrite all 27 ids and pull in internal helpers; do it as its own reviewed
+change with a re-based ledger and a fresh `crystal_refs` migration.
 
 ## Intentional divergences
 
