@@ -85,15 +85,15 @@ duplicate it here.
     golden compare fails.
   - `.golden.new` (pending review) and `*.golden.meta` (golden metadata) are
     artifacts, not fixtures; never commit them.
-- **Last feature commit:** `2ba58d7` (`fix(teatest): pin the test program
-  environment so goldens are deterministic`) plus `df0483a` (CI input fix);
-  before that `ff44b6b` (CI workflow), `b020c55` (review helpers), `0af8267`
-  (send_spec settle), `44101b0`, `dd0267c`
+- **Last feature commit:** `c8e0883` (`chore(deps): track bubbletea main and
+  refresh the goldens`); before that `2ba58d7` (determinism), `df0483a` (CI
+  input fix), `ff44b6b` (CI workflow), `b020c55` (review helpers), `0af8267`
 - **Gates:** `make format` pass; `make lint` pass; `make test` 14 examples,
-  0 failures on 13 consecutive runs (5 of them with `TERM` unset);
-  `make inventory` pass (27 items tracked, backend `regex`, Crystal symbols
-  validated); clean-room CI simulation pass end-to-end; parity preflight
-  `PARITY_SKILL_VERIFIED=1`; GitHub `CI` run `45568077827` success.
+  0 failures on 5 consecutive runs after the `bubbletea` `main` refresh (13
+  earlier with `TERM` unset); `make inventory` pass (27 items tracked, backend
+  `regex`, Crystal symbols validated); clean-room CI simulation pass
+  end-to-end; parity preflight `PARITY_SKILL_VERIFIED=1`; GitHub `CI` runs
+  `45567742970`, `45568077827`, and `45568476812` success.
 
 Keep this block accurate after every feature: the next session reads it first
 (see [AGENTS.md](../AGENTS.md) → **How to resume**).
