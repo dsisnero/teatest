@@ -3,7 +3,7 @@
 This file tracks parity status against the Go source-of-truth in:
 
 - upstream repo: `github.com/charmbracelet/x`
-- upstream commit: `bb9a97036f23256d4201bd73255ca9bd0d2c92f1`
+- upstream commit: `8aab43ea2d8f7bd80d69a75fbdcf5f9aafe27477`
 - `vendor/x/exp/teatest/v2/teatest.go`
 - `vendor/x/exp/teatest/v2/teatest_test.go`
 - `vendor/x/exp/teatest/v2/app_test.go`

@@ -1,5 +1,5 @@
 # source_id	kind	status	crystal_refs	notes
-# baseline=github.com/charmbracelet/x/exp/teatest/v2 @ bb9a97036f23256d4201bd73255ca9bd0d2c92f1 (vendor/x/exp/teatest/v2)
+# baseline=github.com/charmbracelet/x/exp/teatest/v2 @ 8aab43ea2d8f7bd80d69a75fbdcf5f9aafe27477 (vendor/x/exp/teatest/v2)
 # kinds=class,function,interface,method,struct,test,type
 teatest.go::function::NewTestModel	function	ported	src/teatest.cr::method::Teatest.new_test_model	Teatest.new_test_model
 teatest.go::function::RequireEqualOutput	function	ported	src/teatest.cr::method::Teatest.require_equal_output	Teatest.require_equal_output

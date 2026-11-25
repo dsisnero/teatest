@@ -1,6 +1,6 @@
 ---
 upstream_repo: "https://github.com/charmbracelet/x"
-pinned_revision: "bb9a97036f23256d4201bd73255ca9bd0d2c92f1"
+pinned_revision: "8aab43ea2d8f7bd80d69a75fbdcf5f9aafe27477"
 import_mode: "submodule"
 upstream_submodule_path: "vendor/x/exp/teatest/v2"
 ---
@@ -10,7 +10,7 @@ upstream_submodule_path: "vendor/x/exp/teatest/v2"
 ## Upstream Source of Truth
 
 - Repository: `https://github.com/charmbracelet/x`
-- Pinned revision: `bb9a970` (see `git submodule status vendor/x`)
+- Pinned revision: `8aab43e` (see `git submodule status vendor/x`)
 - Import mode: `submodule` (`.gitmodules` → `vendor/x`)
 - Upstream path: `vendor/x/exp/teatest/v2`
 - Module: `github.com/charmbracelet/x/exp/teatest/v2`

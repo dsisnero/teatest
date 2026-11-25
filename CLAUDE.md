@@ -7,8 +7,8 @@
 
 Crystal port of Go `x/exp/teatest/v2` (Go) from
 [charmbracelet/x](https://github.com/charmbracelet/x), vendored at
-`vendor/x/exp/teatest/v2` (commit `bb9a970`, submodule describe
-`powernap/v0.1.5-52-gbb9a970`). Test helpers for Bubble Tea Crystal programs,
+`vendor/x/exp/teatest/v2` (commit `8aab43e`, submodule describe
+`ansi/v0.11.10-1-g8aab43e`). Test helpers for Bubble Tea Crystal programs,
 including golden-output comparison.
 
 ## Commands
@@ -154,7 +154,7 @@ must be committed as **one** atomic commit before starting the next feature:
 ### Commit message
 
 Porting work starts with `port:` and a one-line feature name, then bullets for
-what changed, then the upstream revision (`charmbracelet/x bb9a970`). Include
+what changed, then the upstream revision (`charmbracelet/x 8aab43e`). Include
 new/changed files, divergences, and gate results so a new session can resume
 from the commit alone. Non-porting maintenance keeps the repository convention
 `<type>(<scope>): <description>` (feat, fix, docs, refactor, test, chore,

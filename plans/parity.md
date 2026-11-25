@@ -8,15 +8,16 @@ duplicate it here.
 ## Where we are
 
 - **Current focus:** none — suite, ledger, parity gates, and CI are green. Pick
-  the first item below. The last feature was the tree-sitter ledger migration
-  (31 symbols, backend `chiasmus-tree-sitter`).
+  the first item below. The last feature was the upstream bump to
+  `charmbracelet/x 8aab43e` (no teatest v2 changes in the range).
 - **Next up** (ordered; tags: `ready`, `decision`, `periodic`, `blocked`):
-  1. **`periodic` Check vendor drift.** `vendor/x` is pinned at `bb9a970`;
-     upstream `charmbracelet/x` main is `8aab43e` (checked 2026-11-24). On the
-     next bump: `git -C vendor/x checkout <sha>`, `make parity-refresh`, compare
-     `plans/inventory/go_source_parity.tsv`/`go_test_parity.tsv`, and add
-     `plans/inventory/v<NN>_delta_triage.tsv`. Exit: refreshed manifests, or a
-     recorded "no relevant teatest v2 changes" note.
+  1. **`periodic` Check vendor drift.** `vendor/x` is pinned at `8aab43e`
+     (bumped 2026-11-25). On the next bump: `find .git -name '._*' -delete`
+     first if git complains about a non-monotonic index, then
+     `git -C vendor/x checkout <sha>`, `make parity-refresh`, compare
+     `plans/inventory/go_source_parity.tsv`/`go_test_parity.tsv`, and diff
+     `exp/teatest` between the two SHAs. Exit: refreshed manifests and a
+     recorded delta note (or a triage file if `exp/teatest` changed).
   2. **`blocked` Remove the 50ms settle.** The query race is gone (the test
      program no longer emits the capability query), but the settle still gives
      both programs a renderer tick so the ping frames land in the capture;
@@ -42,6 +43,9 @@ duplicate it here.
     `function`/`interface`/`method`/`struct`/`type`), validated against Crystal
     discovery; three `alias` types (`FinalOpt`, `TestOption`, `WaitForOption`)
     keep file refs because the vocabulary has no `alias` kind.
+  - Vendored upstream: `vendor/x` at `8aab43e` (47 commits past `bb9a970`; 97
+    files changed overall, none under `exp/teatest`). Manifests regenerated with
+    the tree-sitter vocabulary; upstream `go test ./...` in `v2` passes.
   - Snapshot review helpers (`show_snapshot`, `test_and_review!`, `review!`):
     Crystal-only extension, divergence documented; both review helpers return
     pending `*.golden.new` paths, and `test_and_review!` raises on spec failure.
@@ -174,6 +178,28 @@ A clean-room clone (no lock, empty `lib/`) reproduces the gates locally with the
 same commands, and GitHub run `45568077827` (`df0483a`, 2m31s) passed all of
 them. The workflow does not pin `TERM`: the test-program environment is pinned
 inside `new_test_model`, so captures are environment-independent.
+
+## Upstream bump — 8aab43e (2026-11-25)
+
+`vendor/x` moved from `bb9a970` (`powernap/v0.1.6-34-gbb9a970`) to `8aab43e`
+(`ansi/v0.11.10-1-g8aab43e`), the upstream `main` that the plan had tracked as
+`8aab43e` since 2026-11-24.
+
+- The bump carries 47 upstream commits and 97 changed files, but
+  `git -C vendor/x diff --stat bb9a970 8aab43e -- exp/teatest` is empty: no
+  teatest v2 source or test changes, so no port work and no
+  `v<NN>_delta_triage.tsv` (the skill's `vendor_drift.py` is Rust-shaped and
+  unnecessary for a zero-diff path).
+- Upstream `go test ./...` in `vendor/x/exp/teatest/v2` passes.
+- `make parity-refresh` regenerated the source/test manifests. They were still
+  keyed to the regex vocabulary from before the ledger migration, so this is
+  also the first tree-sitter refresh: the source manifest now lists the same 31
+  declarations as the ledger, and the test manifest adds the test-file helpers
+  (models, methods, types) that tree-sitter discovers.
+- Ledger baseline comment, `divergence.md`, `docs/porting-parity.md`, and
+  `CLAUDE.md` now carry the new revision.
+- `git` reported `non-monotonic index .../._pack-*.idx` on the submodule pack
+  until `find .git -name '._*' -delete` (the documented external-volume fix).
 
 ## Dependency policy decision (2026-11-24)
 

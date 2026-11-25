@@ -11,7 +11,7 @@ port: <feature>
 - divergences, if any
 - gates: make format, make lint, make test, make inventory
 
-charmbracelet/x bb9a970
+charmbracelet/x 8aab43e
 ```
 
 Maintenance uses the repository convention
