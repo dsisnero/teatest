@@ -11,8 +11,9 @@ All notable changes to this project will be documented in this file.
   (`TERM=xterm-256color`, `TERM_PROGRAM=Apple_Terminal`) so Bubble Tea does not
   emit synchronized-output capability queries; golden captures no longer depend
   on the host terminal. Override with `Teatest.with_program_options`.
-- Refreshed `spec/testdata/` for the resolved `bubbletea` `v2.0.8` tag; the
-  fixtures no longer contain `ESC[?2026$p ESC[?2027$p`.
+- `shard.yml` now tracks `bubbletea` from `main` explicitly (it previously
+  resolved the newest release tag, `v2.0.8`); the refreshed fixtures reflect
+  `main` at `a1f8c46` and no longer contain `ESC[?2026$p ESC[?2027$p`.
 - Ignore `*.golden.meta` alongside pending snapshots.
 - `Teatest.review!` now returns the pending `*.golden.new` paths (still printed
   for humans) and accepts an optional `io`.

@@ -141,8 +141,8 @@ under five environments: `env -i`, `TERM=dumb`, `TERM=xterm-256color`,
 `... TERM_PROGRAM=WezTerm`, `... TERM_PROGRAM=Apple_Terminal`):
 
 - Go: 215 bytes, byte-identical in all five environments, no query bytes.
-- Port after the pin: 183 bytes, byte-identical in all five environments, no
-  query bytes.
+- Port after the pin: 179 bytes, byte-identical in all five environments, no
+  query bytes (captured against `bubbletea` `main` `a1f8c46`).
 - The remaining Go/Crystal differences are the renderer divergences documented
   in `divergence.md` (modify-other-keys mode, `ESC[30C` tail update versus
   `.\r ESC[A ESC[J`, shutdown epilogue order), not environment effects.

@@ -81,7 +81,7 @@ every push to `main` and every pull request:
 |------|---------|-------|
 | Checkout | `actions/checkout` with `submodules: recursive` | `vendor/x` is the upstream submodule |
 | Install Crystal | `crystal-lang/install-crystal` | pinned to the compiler that accepted the fixtures (1.22.3) |
-| Install shards | `shards install` | no lock is committed, so dependencies float to the newest release tag |
+| Install shards | `shards install` | `bubbletea` tracks `main`; other shards float to their newest release tag |
 | Format | `make format` | |
 | Lint | `crystal build lib/ameba/src/cli.cr -o bin/ameba`, then `PATH="$PWD/bin:$PATH" make lint` | ameba ships a `targets:` entry, not `executables:`, so `shards install` does not put it on `PATH` |
 | Test | `make test` | environment-independent: the test program env is pinned in `new_test_model` |
@@ -100,10 +100,10 @@ env -i HOME="$HOME" PATH="$PATH" crystal spec
 ```
 
 Because dependencies float, a green local suite with an old `lib/` does not
-guarantee a green CI run: `shards install` without a lock resolves the newest
-release tag, and a stale `~/.cache/shards` clone can serve older code. If a
-fixture suddenly mismatches, check `git hash-object lib/bubbletea/src/tea.cr`
-against the tag before regenerating anything.
+guarantee a green CI run: `bubbletea` tracks `main`, and a stale
+`~/.cache/shards` clone can serve older code. If a fixture suddenly mismatches,
+run `make update`, then check `git hash-object lib/bubbletea/src/tea.cr` against
+`main` before regenerating anything.
 
 ## Project Structure and Porting Notes
 

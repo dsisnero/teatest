@@ -35,12 +35,14 @@ duplicate it here.
     8/8 ported.
   - Test parity (6 upstream tests): 6/6 stable; `send_spec` keeps its 50ms
     render-tick settle.
-  - Golden fixtures: regenerated against the resolved `bubbletea` `v2.0.8` tag
-    with a pinned test-program environment; no capability-query bytes.
+  - Golden fixtures: regenerated against `bubbletea` `main` (`a1f8c46`, which
+    reports `2.1.0+git.commit.a1f8c46`) with a pinned test-program environment;
+    no capability-query bytes.
   - Determinism: Go and Crystal captures were compared under five environments
     (`env -i`, `TERM=dumb`, `TERM=xterm-256color`, `+TERM_PROGRAM=WezTerm`,
     `+TERM_PROGRAM=Apple_Terminal`). Each side was byte-identical across all
-    five; the remaining Go/Crystal difference is renderer behavior only.
+    five (Go 215 bytes, Crystal 179 bytes); the remaining Go/Crystal difference
+    is renderer behavior only.
   - Ledger refs: 24/27 symbol-validated (`path::kind::name`); the three
     Crystal `alias` types keep file refs because the regex vocabulary does not
     discover aliases.
@@ -57,14 +59,17 @@ duplicate it here.
   - The curated ledger uses the `regex` discovery vocabulary
     (`func`/`method`/`struct`/`type`), so pin `PORT_PARSER=regex`; the
     tree-sitter candidate was reviewed and deferred (assessment below).
-  - `shards install` without a lock resolves the newest **release tag**
-    (`bubbletea` `v2.0.8`), not `main` HEAD, which is why CI and a fresh
-    checkout behave the same even though dependencies float. A stale
-    `~/.cache/shards` clone can still serve an older commit; if `lib/` disagrees
-    with a clean-room install, re-clone the cache entry and reinstall.
+  - `shards install` resolves what `shard.yml` asks for: `bubbletea` now pins
+    `branch: main` explicitly, so installs take branch HEAD (`a1f8c46` today,
+    reported as `2.1.0+git.commit…`), while unversioned shards such as `golden`
+    resolve their newest release tag. `make update` refreshes `bubbletea` to the
+    current `main`; run it before accepting rendering changes.
+  - A stale `~/.cache/shards` clone can serve an older commit or another
+    branch; if `lib/` disagrees with a clean-room install, re-clone the cache
+    entry and reinstall.
   - A previous local `lib/bubbletea` came from the
     `codex/flush-initial-frame` branch and hid the divergence. Check
-    `git hash-object lib/bubbletea/src/tea.cr` against the tag before trusting a
+    `git hash-object lib/bubbletea/src/tea.cr` against `main` before trusting a
     local capture.
   - `Teatest.new_test_model` pins the test program's environment
     (`TERM=xterm-256color`, `TERM_PROGRAM=Apple_Terminal`) so Bubble Tea never
@@ -173,13 +178,13 @@ inside `new_test_model`, so captures are environment-independent.
 - Consequences: `make install`/`make update` can change the byte stream, so
   never commit a fixture diff without naming the dependency change; CI has no
   lock to restore and reinstalls from scratch.
-- Resolution behavior (verified 2026-11-25): without a lock, `shards install`
-  resolves the newest **release tag** for a git dependency (`bubbletea` `v2.0.8`),
-  not the branch head, so a clean checkout and CI agree even though dependencies
-  float. A local `shard.lock` recorded the same tag, which is why `make update`
-  did not move anything. A stale `~/.cache/shards` clone can serve an older
-  commit or another branch; inspect `git hash-object lib/<shard>/src/...` against
-  the tag before trusting a capture.
+- Resolution behavior (verified 2026-11-25): `bubbletea` pins `branch: main`, so
+  a lock-free install takes branch HEAD (`a1f8c46`, reported as
+  `2.1.0+git.commit…`); unversioned shards such as `golden` still resolve their
+  newest release tag. `make update` moves `bubbletea` to the current `main`, so
+  run it before accepting rendering changes. A stale `~/.cache/shards` clone can
+  serve an older commit or another branch; inspect
+  `git hash-object lib/<shard>/src/...` against `main` before trusting a capture.
 - Revisit if: two machines disagree on a fixture, or an upstream regression
   cannot be attributed without a bisectable lock. (The 2026-11-25 fixture drift
   had this trigger fire, but the cause was a branch-local `lib/` install and a
