@@ -14,6 +14,12 @@ describe "Teatest send" do
       tm1.type("pp")
       tm2.type("pppp")
 
+      # Keep both programs alive past the first render so bubbletea.cr flushes
+      # its startup capability queries before shutdown. Otherwise their
+      # position relative to the epilogue is scheduling-dependent and the two
+      # captures can differ. See lib_issues/bubbletea.5.md.
+      sleep 50.milliseconds
+
       tm1.type("q")
       tm2.type("q")
 

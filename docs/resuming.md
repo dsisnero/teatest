@@ -40,11 +40,13 @@ make inventory
 ```
 
 Format, lint, and inventory must pass before changing anything. `make test`
-passes most runs; the known exception is `TestAppSendToOtherProgram`, which can
-fail when the two programs' capability-query bytes land in different positions.
-That is the top item in the plan's **Next up** list
-([lib_issues/bubbletea.5.md](../lib_issues/bubbletea.5.md)),
-not golden drift — do not normalize the fixture to hide it.
+passes 10/10 runs; `spec/send_spec.cr` keeps both programs alive 50ms past a
+renderer tick so the startup capability-query flush cannot land on different
+sides of shutdown in the two captures. If a send-only failure reappears where
+the outputs differ solely in the position of `ESC[?2026$p ESC[?2027$p`, that
+settle was lost — see
+[lib_issues/bubbletea.5.md](../lib_issues/bubbletea.5.md). Do not normalize the
+fixture to hide it.
 
 `make inventory` forwards to the installed cross-language parity skill and
 prints `PARITY_DISCOVERY_BACKEND=regex`. It also validates `crystal_refs`

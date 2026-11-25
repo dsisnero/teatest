@@ -30,7 +30,7 @@ teatest.go::type::TestOption	type	ported	src/teatest.cr	Teatest::TestOption (ali
 teatest.go::type::WaitForOption	type	ported	src/teatest.cr	Teatest::WaitForOption (alias; not discovered by regex vocabulary)
 app_test.go::test::TestApp	test	ported	spec/app_spec.cr	spec + golden accepted (Crystal output ordering)
 app_test.go::test::TestAppInteractive	test	ported	spec/app_spec.cr	spec ported
-send_test.go::test::TestAppSendToOtherProgram	test	partial	spec/send_spec.cr	flaky: bubbletea.cr capability-query ordering (lib_issues/bubbletea.5.md)
+send_test.go::test::TestAppSendToOtherProgram	test	ported	spec/send_spec.cr	50ms settle before quit keeps query flush past a tick; boundary tracked in lib_issues/bubbletea.5.md
 teatest_test.go::test::TestWaitFinishedWithTimeoutFn	test	ported	spec/teatest_spec.cr	spec ported
 teatest_test.go::test::TestWaitForErrorReader	test	ported	spec/teatest_spec.cr	spec ported
 teatest_test.go::test::TestWaitForTimeout	test	ported	spec/teatest_spec.cr	spec ported

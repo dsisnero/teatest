@@ -52,12 +52,14 @@ status: [plans/inventory/go_port_inventory.tsv](plans/inventory/go_port_inventor
      the Crystal fixture emits `ESC[J`, cursor move, and keyboard enhancement
      reset sequences in a different order
 
-   The `TestApp` golden was reviewed and accepted against the current Crystal
-   output. `TestAppSendToOtherProgram` remains flaky because `bubbletea.cr`
-   flushes its startup capability queries through the renderer buffer, so their
-   position relative to shutdown varies between programs; see
-   [lib_issues/bubbletea.5.md](lib_issues/bubbletea.5.md)
-   and [plans/parity.md](plans/parity.md).
+   The `TestApp` golden was re-accepted after the dependency refresh, and
+   `TestAppSendToOtherProgram` now settles 50ms before quitting so the startup
+   capability query is flushed by a renderer tick before shutdown. The
+   underlying query-flush boundary is tracked in
+   [lib_issues/bubbletea.5.md](lib_issues/bubbletea.5.md); the vendor Go
+   fixtures were captured in an environment without the query, so regenerate
+   from Go rather than diffing across environments
+   ([lib_issues/bubbletea.4.fixed.md](lib_issues/bubbletea.4.fixed.md)).
 
 2. **No Go `testing.TB`**: Crystal does not expose it directly. The port ships
    the `Teatest::TB` shim with `fatal(...)` and raises exceptions elsewhere.

@@ -45,3 +45,40 @@ Align startup/shutdown and renderer flush control-sequence behavior in `bubblete
 ```diff
 # No local shard patch included yet; this issue tracks parity gap and requests upstream alignment.
 ```
+
+## Verification (2026-11-24, `bubbletea.cr` after the control-sequence and
+## renderer work in this stretch)
+
+**This report is stale — the sequences it lists no longer differ from Go.**
+
+The prologue/epilogue listed above (`\e[>4;1m\e[?4m\e[>1u`, `\e[=0;1u`) are
+from `bubbletea` `a1430ed` (Crystal 1.19.1). The current port emits what the
+pinned Go v2 emits, verified byte for byte:
+
+```bash
+# oracle: bubbletea-examples/goldens/quickquit (Go capture, upstream f9df43c)
+cd bubbletea-examples/goldens && GODEBUG=randseednop=0 go run ./quickquit \
+  > /tmp/go.bin
+# and the Crystal port's capture of the same program -> /tmp/crystal.bin
+cmp /tmp/go.bin /tmp/crystal.bin    # identical, 81 bytes
+```
+
+```
+\e[?25l\e[?2004h\e[>4;2m\e[>1u\r\e[Jhello\e[>4m\e[<1u\r\e[J\e[?25h\e[?2004l\e[?2026$p\e[?2027$p
+```
+
+The bytes are now pinned by `spec/startup_shutdown_sequences_spec.cr`, so a
+regression fails in `bubbletea.cr` rather than in this repository. The remaining
+fixture difference is environmental: `TestApp*.golden` in
+`vendor/x/exp/teatest/v2/testdata` was captured where
+`shouldQuerySynchronizedOutput` was false, so it has no capability query; the
+port (and Go, in a bare shell) does query. Regenerate fixtures from Go in the
+same environment rather than comparing across environments.
+
+## Suggested teatest-side follow-up
+
+The query-flush boundary also makes two captures non-deterministic (see
+[bubbletea.5.md](bubbletea.5.md)). Make `spec/send_spec.cr` independent of it:
+keep the programs alive past one frame (≥ 50ms) before quitting, or normalise
+the capability query out of both captures before comparing. Implemented as a
+50ms settle before the quit keys; see [bubbletea.5.md](bubbletea.5.md).

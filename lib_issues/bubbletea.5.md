@@ -79,3 +79,46 @@ that two identical programs produce equal byte streams and that
   fail on the race.
 - The ledger keeps `TestAppSendToOtherProgram` at `partial` and
   `plans/parity.md` tracks the dependency fix as the top open item.
+
+## Verification (2026-11-24, `bubbletea.cr` after the control-sequence and
+## renderer work in this stretch)
+
+**The flakiness is real, but its stated cause is not a `bubbletea.cr` bug: Go
+behaves the same way.**
+
+Go's capability query sits in the program's output buffer and is flushed by
+whichever comes first — a renderer tick, or `restoreTerminalState` at shutdown
+(`vendor/bubbletea` `tty.go:34`, which runs after `stopRenderer`). A Go probe of
+the same model (`bubbletea-examples/goldens/quickquit`) shows both positions:
+
+```
+delay 0s   query at  63 len  81     # quit before the first tick -> after epilogue
+delay 20ms query at   0 len  85     # a tick flushed it first   -> before the frame
+```
+
+The Crystal port produces exactly these bytes for the same two timings
+(`spec/startup_shutdown_sequences_spec.cr` pins the first case against Go), so
+`out1 == out2` can only hold when both programs land on the same side of that
+boundary. `x/exp/teatest/v2`'s fixture never shows the problem because it was
+captured where `shouldQuerySynchronizedOutput` was false, so Go emitted no query
+at all.
+
+Two things were still changed on the `bubbletea.cr` side:
+
+- the renderer stop handshake now waits for the renderer fiber to exit, matching
+  Go's unbuffered `rendererDone` rendezvous, so a tick in flight can never flush
+  a frame or queued output after `renderer.close` wrote the epilogue;
+- `spec/startup_shutdown_sequences_spec.cr` pins Go's exact startup/shutdown
+  bytes (including the query position) with an explicit empty environment, so the
+  port's side of this is regression-tested.
+
+## Suggested teatest-side follow-up (implemented 2026-11-24)
+
+Make `send_spec` independent of the boundary: either keep the programs alive for
+more than one frame (≥ 50ms) before quitting, so the query is always flushed by
+a tick, or normalise the capability query out of both captures before comparing.
+
+`spec/send_spec.cr` now sleeps 50ms after the pings and before the quit keys, so
+both programs remain alive past a renderer tick. The spec passed 10/10
+full-suite runs with that settle. This report stays open so the workaround can
+be removed once the boundary is deterministic upstream.

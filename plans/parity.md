@@ -7,16 +7,18 @@ duplicate it here.
 
 ## Where we are
 
-- **Current focus:** `TestAppSendToOtherProgram` is flaky. The two programs
-  differ only in where `bubbletea.cr` flushes its startup capability queries
-  (`ESC[?2026$p ESC[?2027$p`), so `out1.should eq out2` and the golden compare
-  fail in roughly 1 of 5 full-suite runs. Root cause and repro:
-  [lib_issues/bubbletea.5.md](../lib_issues/bubbletea.5.md).
+- **Current focus:** vendor dependency refresh. `make update` pulled `golden`
+  0.3.0 and newer `ultraviolet`/`ansi`; the rendering bytes changed, fixtures
+  were re-accepted in the new environment, and `send_spec` now keeps both
+  programs alive for 50ms before quitting so it no longer straddles the
+  capability-query flush boundary
+  ([lib_issues/bubbletea.5.md](../lib_issues/bubbletea.5.md)).
+  10/10 full-suite runs pass.
 - **Next up:**
   1. Track
      [lib_issues/bubbletea.5.md](../lib_issues/bubbletea.5.md)
-     upstream; when it lands, re-run the send spec 5× and flip the ledger row
-     to `ported`. Do not patch `lib/`.
+     upstream; once the query boundary is deterministic, drop the 50ms settle
+     in `spec/send_spec.cr`. Do not patch `lib/`.
   2. Treat the tree-sitter ledger migration as a dedicated reviewed change
      (assessment below); it is not worth interrupting the current ledger.
   3. On an upstream bump, refresh the manifests with `make parity-refresh` and
@@ -26,10 +28,9 @@ duplicate it here.
   - `TestModel` + `SafeReadWriter` methods: 10/10 ported.
   - Types and options (`TestOption`, `WaitForOption`, `FinalOpt`, structs):
     8/8 ported.
-  - Test parity (6 upstream tests): 5 stable; `TestAppSendToOtherProgram`
-    ported but flaky on the dependency race above.
-  - Golden fixtures: `TestApp` accepted against current Crystal output; send
-    fixture current but the spec around it is racy.
+  - Test parity (6 upstream tests): 6/6 stable after the `send_spec` settle.
+  - Golden fixtures: re-accepted after the dependency refresh (testdata now
+    reflects the installed `golden`/`ultraviolet`/`ansi` rendering).
   - Ledger refs: 24/27 symbol-validated (`path::kind::name`); the three
     Crystal `alias` types keep file refs because the regex vocabulary does not
     discover aliases.
@@ -41,20 +42,26 @@ duplicate it here.
   - The curated ledger uses the `regex` discovery vocabulary
     (`func`/`method`/`struct`/`type`), so pin `PORT_PARSER=regex`; the
     tree-sitter candidate was reviewed and deferred (assessment below).
-  - A send-only failure whose two outputs differ solely in the position of
-    `ESC[?2026$p ESC[?2027$p` is this dependency race, not golden drift. Do not
-    "fix" it by normalizing the fixture.
+  - Fixtures are environment-sensitive: the vendor Go goldens were captured
+    where `shouldQuerySynchronizedOutput` was false, so do not diff them against
+    a bare-shell Crystal capture (see
+    [lib_issues/bubbletea.4.fixed.md](../lib_issues/bubbletea.4.fixed.md)).
+  - `send_spec` must keep both programs alive past a renderer tick (≥50ms)
+    before quitting; a send-only failure whose outputs differ solely in the
+    position of `ESC[?2026$p ESC[?2027$p` means that settle was lost. Do not
+    "fix" it by normalizing the fixture
+    ([lib_issues/bubbletea.5.md](../lib_issues/bubbletea.5.md)).
   - `.golden.new` files are review artifacts, not fixtures; never commit them.
   - `bubbletea.cr`/`ultraviolet` emit terminal capability queries
     (`ESC[?2026$p`, `ESC[?2027$p`) and modify-other-keys mode
-    (`ESC[>4;2m`) that Go does not, which is the source of golden drift.
-- **Last feature commit:** `dd0267c` (`chore(parity): validate ledger refs as
-  symbols and rehome shard bug reports`); earlier `dbad171` (parity tooling
-  adoption) and `5545ced` (snapshot wrappers)
+    (`ESC[>4;2m`) that Go only emits in a querying environment.
+- **Last feature commit:** `44101b0` (`docs(lib_issues): number shard bug
+  reports and mark fixed ones`); earlier `dd0267c` (ledger symbol refs) and
+  `dbad171` (parity tooling adoption)
 - **Gates:** `make format` pass; `make lint` pass; `make test` 12 examples,
-  0 failures on 4 of 5 runs (1 send flake, above); `make inventory` pass
-  (27 items tracked, backend `regex`, Crystal symbols validated); adversarial
-  signoff pass (`crystal spec` + upstream `go test ./...`).
+  0 failures on 10 of 10 runs; `make inventory` pass (27 items tracked, backend
+  `regex`, Crystal symbols validated); adversarial signoff pass (`crystal spec`
+  + upstream `go test ./...`).
 
 Keep this block accurate after every feature: the next session reads it first
 (see [AGENTS.md](../AGENTS.md) → **How to resume**).
@@ -79,8 +86,8 @@ Keep this block accurate after every feature: the next session reads it first
 - [x] Port `TestWaitForErrorReader`, `TestWaitForTimeout`,
       `TestWaitFinishedWithTimeoutFn` (`spec/teatest_spec.cr`)
 - [x] Make `TestApp` pass without pending snapshots
-- [ ] Make `TestAppSendToOtherProgram` pass without pending snapshots
-      (blocked on the capability-query ordering race)
+- [x] Make `TestAppSendToOtherProgram` pass without pending snapshots
+      (50ms settle before quit keeps both programs past a renderer tick)
 
 ## Phase 3 — Snapshot workflow
 
@@ -100,9 +107,11 @@ Keep this block accurate after every feature: the next session reads it first
 
 ## Phase 5 — Dependency alignment
 
-- [ ] Fix the `bubbletea.cr` capability-query ordering race
-      ([lib_issues/bubbletea.5.md](../lib_issues/bubbletea.5.md))
-      and make the send spec deterministic
+- [x] Make `spec/send_spec.cr` independent of the capability-query flush
+      boundary: keep both programs alive 50ms past a renderer tick before
+      quitting ([lib_issues/bubbletea.5.md](../lib_issues/bubbletea.5.md))
+- [ ] Remove the settle once the boundary is deterministic upstream and the
+      fixtures can be regenerated in the same environment
 
 ## Tree-sitter candidate assessment (2026-11-24)
 
@@ -131,3 +140,7 @@ change with a re-based ledger and a fresh `crystal_refs` migration.
   Go's `interface{}` message type.
 - Golden bytes follow Crystal Bubble Tea/ultraviolet output ordering rather
   than the Go byte stream (see [divergence.md](../divergence.md)).
+- `spec/send_spec.cr` sleeps 50ms after the pings and before the quit keys so
+  both programs are alive past a renderer tick; without it the startup
+  capability query can flush on either side of the shutdown epilogue
+  ([lib_issues/bubbletea.5.md](../lib_issues/bubbletea.5.md)).
