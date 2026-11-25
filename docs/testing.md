@@ -47,7 +47,7 @@ end
 Teatest.show_snapshot("spec/testdata/TestApp.golden")
 
 # Run tests then review pending snapshots
-Teatest.test_and_review!
+Teatest.test_and_review!("crystal spec")
 
 # List pending snapshots
 Teatest.review!
@@ -68,7 +68,17 @@ Set `GOLDEN_UPDATE=1` to regenerate golden files:
 GOLDEN_UPDATE=1 crystal spec
 ```
 
-Use `Golden.accept_all!` or `Golden.reject_all!` to manage pending snapshots.
+On a mismatch the golden library writes a pending `*.golden.new` file next to
+the fixture and fails the example. Pending files are review artifacts: they are
+gitignored and must be accepted or rejected (see the snapshot workflow in
+[resuming.md](resuming.md)) rather than committed. Use `Golden.accept_all!` or
+`Golden.reject_all!` to manage pending snapshots.
+
+## Parity Checks
+
+`make inventory` validates the parity ledger against the pinned vendor tree.
+The gate forwards to the installed cross-language parity skill; see
+[porting-parity.md](porting-parity.md).
 
 ## Coverage
 

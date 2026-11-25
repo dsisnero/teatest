@@ -8,11 +8,15 @@ Crystal port of the Go `x/exp/teatest/v2` library for testing Term2 programs. Th
 teatest/
 ├── src/teatest.cr              # Main library implementation
 ├── spec/                       # Crystal specs
-│   ├── teatest_spec.cr        # Main test suite
+│   ├── teatest_spec.cr        # Core + timeout + golden wrapper specs
 │   ├── app_spec.cr            # App testing specs
 │   ├── send_spec.cr           # Send functionality specs
 │   └── testdata/              # Golden test files
-├── vendor/x/exp/teatest/v2/   # Upstream Go source (submodule)
+├── plans/
+│   ├── parity.md              # Curated roadmap + "Where we are"
+│   └── inventory/             # Ledger and generated parity manifests
+├── scripts/                   # Forwarding wrappers to the parity skill
+├── vendor/x/exp/teatest/v2/   # Upstream Go source of truth (submodule)
 │   ├── teatest.go             # Go implementation
 │   ├── teatest_test.go        # Go tests
 │   └── testdata/              # Go golden files
@@ -43,5 +47,12 @@ teatest/
 - **`Golden`**: Golden file testing (external dependency)
   - File comparison with diff output
   - Update mode for regenerating golden files
+
+## Working on the port
+
+Current state and the next feature live in [plans/parity.md](../plans/parity.md).
+Start every session with [docs/resuming.md](resuming.md); the parity ledger in
+`plans/inventory/` tracks per-symbol status against the pinned
+`vendor/x/exp/teatest/v2` tree.
 
 <!-- TODO: Add diagrams if helpful -->

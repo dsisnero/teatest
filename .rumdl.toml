@@ -1,9 +1,30 @@
-[tool.rumdl]
-version = "0.1.0"
-language = "crystal"
-exclude = ["lib/", ".crystal-cache/", ".shards/", "spec/", "vendor/"]
-include = ["src/"]
-output = "docs/architecture.md"
-format = "markdown"
-title = "Architecture Overview"
-generate_on_save = false
+# rumdl configuration file
+# Validate with: rumdl check docs README.md
+
+[global]
+# Keep documentation linting advisory until the backlog is cleared.
+exclude = [
+    ".git",
+    ".github",
+    ".beads",
+    ".chiasmus",
+    ".crystal-cache",
+    ".shards",
+    "lib",
+    "lib_issues",
+    "node_modules",
+    "spec",
+    "temp",
+    "vendor",
+    "CHANGELOG.md",
+    "LICENSE.md",
+]
+
+# Respect .gitignore files when scanning directories (default: true)
+respect-gitignore = true
+
+[MD013]
+line-length = 100
+code-blocks = false
+tables = false
+headings = false

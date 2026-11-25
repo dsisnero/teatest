@@ -2,7 +2,20 @@
 
 ## Commit Conventions
 
-Format: `<type>(<scope>): <description>`
+Porting work — one completed feature per commit:
+
+```
+port: <feature>
+
+- what changed and which upstream symbol it mirrors
+- divergences, if any
+- gates: make format, make lint, make test, make inventory
+
+charmbracelet/x bb9a970
+```
+
+Maintenance uses the repository convention
+`<type>(<scope>): <description>`.
 
 Types: feat, fix, docs, refactor, test, chore, perf
 
@@ -33,6 +46,7 @@ Format: `<type>/<issue-number>-<short-kebab-description>`
 - [ ] CHANGELOG.md updated for user-facing changes
 - [ ] Lint/format checks pass (`make format && make lint`)
 - [ ] All tests pass (`make test`)
+- [ ] Parity ledger is current (`make inventory`)
 - [ ] Upstream parity verified (Go tests pass in `vendor/x/exp/teatest/v2`)
 
 ## Review Process

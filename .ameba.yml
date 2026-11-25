@@ -36,6 +36,7 @@ Lint/DebugCalls:
 # Exclude vendor directory (upstream source)
 AllCops:
   Exclude:
+    - temp/**/*
     - vendor/**/*
     - lib/**/*
     - spec/**/*

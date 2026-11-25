@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
+# Forwarding wrapper. The canonical parity scripts live in the installed
+# cross-language-crystal-parity skill; never copy its Ruby implementation here.
 set -euo pipefail
 
-ROOT_DIR="${1:-$(pwd)}"
-MANIFEST="${2:-}"
-SOURCE_PATH="${3:-${PORT_SOURCE_DIR:-}}"
-LANGUAGE="${4:-${PORT_LANGUAGE:-go}}"
-PARSER="${PORT_PARSER:-auto}"
+SKILL_DIR="${PARITY_SKILL_DIR:-${HOME}/.agents/skills/crystal_forge/skills/cross-language-crystal-parity}"
+CANONICAL="${SKILL_DIR}/scripts/$(basename "${BASH_SOURCE[0]}")"
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ ! -x "${CANONICAL}" ]]; then
+  echo "Missing canonical parity script: ${CANONICAL}" >&2
+  echo "Set PARITY_SKILL_DIR to the installed cross-language-crystal-parity skill." >&2
+  exit 2
+fi
 
-args=(--root "${ROOT_DIR}" --language "${LANGUAGE}" --parser "${PARSER}")
-[[ -n "${MANIFEST}" ]] && args+=(--manifest "${MANIFEST}")
-[[ -n "${SOURCE_PATH}" ]] && args+=(--source "${SOURCE_PATH}")
-
-"${SCRIPT_DIR}/check_port_inventory.rb" "${args[@]}"
+exec "${CANONICAL}" "$@"

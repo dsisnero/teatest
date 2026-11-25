@@ -4,6 +4,7 @@
 </p>
 
 <p align="center">
+  <a href="docs/resuming.md">Resuming</a> &middot;
   <a href="docs/architecture.md">Architecture</a> &middot;
   <a href="docs/development.md">Development</a> &middot;
   <a href="docs/coding-guidelines.md">Guidelines</a> &middot;
@@ -14,7 +15,10 @@
 
 ---
 
-Test helpers for Term2 programs. This is a Crystal port of the Go `x/exp/teatest/v2` package from charmbracelet/ansi.
+Test helpers for Term2 programs. This is a Crystal port of the Go
+`x/exp/teatest/v2` package from
+[charmbracelet/x](https://github.com/charmbracelet/x). Current porting state
+lives in [plans/parity.md](plans/parity.md).
 
 ---
 
@@ -87,14 +91,19 @@ make test
 # Check code quality
 make format
 make lint
+
+# Check parity ledger drift
+make inventory
 ```
 
-See [Development Guide](docs/development.md) for full setup instructions.
+See [Development Guide](docs/development.md) for full setup instructions and
+[Resuming Work](docs/resuming.md) before starting a new session.
 
 ## Documentation
 
 | Document | Purpose |
 |----------|---------|
+| [Resuming Work](docs/resuming.md) | First steps in a new session |
 | [Architecture](docs/architecture.md) | System design and data flow |
 | [Development](docs/development.md) | Setup and daily workflow |
 | [Coding Guidelines](docs/coding-guidelines.md) | Code style and conventions |

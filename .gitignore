@@ -12,6 +12,12 @@
 /temp/
 /d:/tmp
 
+# Pending golden snapshots (review artifacts, never committed)
+*.golden.new
+
+# macOS AppleDouble sidecars (external/network volumes)
+._*
+
 # IDE and editor files
 .vscode/
 .idea/
