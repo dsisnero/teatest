@@ -52,19 +52,29 @@ status: [plans/inventory/go_port_inventory.tsv](plans/inventory/go_port_inventor
      the Crystal fixture emits `ESC[J`, cursor move, and keyboard enhancement
      reset sequences in a different order
 
-   The `TestApp` golden was re-accepted after the dependency refresh, and
-   `TestAppSendToOtherProgram` now settles 50ms before quitting so the startup
-   capability query is flushed by a renderer tick before shutdown. The
-   underlying query-flush boundary is tracked in
-   [lib_issues/bubbletea.5.md](lib_issues/bubbletea.5.md); the vendor Go
-   fixtures were captured in an environment without the query, so regenerate
-   from Go rather than diffing across environments
-   ([lib_issues/bubbletea.4.fixed.md](lib_issues/bubbletea.4.fixed.md)).
+   The `TestApp` golden was re-accepted after the dependency refresh. The
+   vendor Go fixtures never contain a capability query because the pinned
+   upstream (`charm.land/bubbletea/v2 v2.0.0-rc.1`) has no synchronized-output
+   query at all, while the Crystal shard emits one when its terminal heuristic
+   sees an interactive terminal. See the environment divergence below and
+   [lib_issues/bubbletea.5.md](lib_issues/bubbletea.5.md);
+   [lib_issues/bubbletea.4.fixed.md](lib_issues/bubbletea.4.fixed.md) explains
+   why the fixtures must be regenerated rather than diffed across environments.
 
-2. **No Go `testing.TB`**: Crystal does not expose it directly. The port ships
+2. **Pinned test-program environment**: `Teatest.new_test_model` sets the
+   program's environment to `TERM=xterm-256color` plus
+   `TERM_PROGRAM=Apple_Terminal` instead of inheriting the host environment.
+   That keeps Bubble Tea's terminal heuristic from emitting
+   `ESC[?2026$p ESC[?2027$p`, which the pinned Go upstream never emits and whose
+   position relative to the first frame is scheduling-dependent. The result is
+   an environment-independent byte stream, so goldens no longer depend on the
+   developer's `TERM`. Override the environment with
+   `Teatest.with_program_options` when a test needs the real values.
+
+3. **No Go `testing.TB`**: Crystal does not expose it directly. The port ships
    the `Teatest::TB` shim with `fatal(...)` and raises exceptions elsewhere.
 
-3. **Snapshot review helpers**: `show_snapshot`, `test_and_review!`, and
+4. **Snapshot review helpers**: `show_snapshot`, `test_and_review!`, and
    `review!` are a Crystal-only extension layered on `dsisnero/golden`, which
    exposes pending-snapshot review. Go relies on `testing.TB` failure hooks
    instead. Both review helpers return the pending `*.golden.new` paths:

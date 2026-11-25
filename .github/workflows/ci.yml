@@ -9,12 +9,6 @@ on:
 permissions:
   contents: read
 
-# Terminal capability queries (DECRQM 2026/2027) are emitted only when `TERM`
-# looks interactive, and the accepted golden fixtures include those bytes.
-# A bare runner has no `TERM`, so pin it for the whole job.
-env:
-  TERM: xterm-256color
-
 jobs:
   gates:
     name: format, lint, test, parity

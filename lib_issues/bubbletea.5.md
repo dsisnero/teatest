@@ -122,3 +122,34 @@ a tick, or normalise the capability query out of both captures before comparing.
 both programs remain alive past a renderer tick. The spec passed 10/10
 full-suite runs with that settle. This report stays open so the workaround can
 be removed once the boundary is deterministic upstream.
+
+## Resolution for teatest (2026-11-25)
+
+`Teatest.new_test_model` now pins the program environment
+(`TERM=xterm-256color`, `TERM_PROGRAM=Apple_Terminal`) instead of inheriting the
+host environment. Bubble Tea's terminal heuristic then reports a non-querying
+terminal and the capability query is never emitted, so the query-position race
+cannot affect a capture.
+
+This matches the pinned Go upstream: the `charm.land/bubbletea/v2 v2.0.0-rc.1`
+module required by `vendor/x/exp/teatest/v2` contains no synchronized-output
+query at all. The query is a `bubbletea.cr` divergence from that release, not
+something the Go fixture ever contained.
+
+Evidence (same machine; `TestApp` scenario captured from Go and from the port
+under five environments: `env -i`, `TERM=dumb`, `TERM=xterm-256color`,
+`... TERM_PROGRAM=WezTerm`, `... TERM_PROGRAM=Apple_Terminal`):
+
+- Go: 215 bytes, byte-identical in all five environments, no query bytes.
+- Port after the pin: 183 bytes, byte-identical in all five environments, no
+  query bytes.
+- The remaining Go/Crystal differences are the renderer divergences documented
+  in `divergence.md` (modify-other-keys mode, `ESC[30C` tail update versus
+  `.\r ESC[A ESC[J`, shutdown epilogue order), not environment effects.
+
+The 50ms settle in `spec/send_spec.cr` stays, but for a different reason: it
+keeps both programs alive long enough to paint the ping frames that the golden
+captures. Removing it fails 5/5 runs with an output mismatch (the captures have
+no ping frames), so it is load-bearing for the fixture rather than a race
+guard. The comment in the spec says so.
+

@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Added `.github/workflows/ci.yml` running `make format`, `make lint`,
+  `make test`, and the parity preflight plus `make inventory` on push and pull
+  requests.
+- `Teatest.new_test_model` pins the test program's environment
+  (`TERM=xterm-256color`, `TERM_PROGRAM=Apple_Terminal`) so Bubble Tea does not
+  emit synchronized-output capability queries; golden captures no longer depend
+  on the host terminal. Override with `Teatest.with_program_options`.
+- Refreshed `spec/testdata/` for the resolved `bubbletea` `v2.0.8` tag; the
+  fixtures no longer contain `ESC[?2026$p ESC[?2027$p`.
+- Ignore `*.golden.meta` alongside pending snapshots.
 - `Teatest.review!` now returns the pending `*.golden.new` paths (still printed
   for humans) and accepts an optional `io`.
 - `Teatest.test_and_review!` now returns the pending snapshot paths and raises

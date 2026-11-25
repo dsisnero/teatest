@@ -14,6 +14,7 @@
 
 # Pending golden snapshots (review artifacts, never committed)
 *.golden.new
+*.golden.meta
 
 # macOS AppleDouble sidecars (external/network volumes)
 ._*

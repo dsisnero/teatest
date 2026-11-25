@@ -21,10 +21,11 @@ crystal spec --update
 - **Golden files**: Located in `spec/testdata/` with `.golden` extension
 - **Test structure**: Use `Spec` framework with `describe`/`it` blocks
 - **Porting tests**: Translate Go tests from `vendor/x/exp/teatest/v2/*_test.go`
-- **Environment**: the rendering fixtures contain the terminal capability
-  queries Bubble Tea emits when `TERM` looks interactive. Run the suite with a
-  real `TERM` (CI uses `TERM=xterm-256color`); under `env -i` without `TERM`
-  the app goldens mismatch because those queries are skipped.
+- **Environment**: `Teatest.new_test_model` pins the test program's environment
+  (`TERM=xterm-256color`, `TERM_PROGRAM=Apple_Terminal`) so Bubble Tea never
+  emits its synchronized-output query; captures are therefore identical on any
+  host terminal and under `env -i`. Tests that need the real environment can
+  override it with `Teatest.with_program_options`.
 
 ## Writing Tests
 

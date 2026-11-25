@@ -81,25 +81,29 @@ every push to `main` and every pull request:
 |------|---------|-------|
 | Checkout | `actions/checkout` with `submodules: recursive` | `vendor/x` is the upstream submodule |
 | Install Crystal | `crystal-lang/install-crystal` | pinned to the compiler that accepted the fixtures (1.22.3) |
-| Install shards | `shards install` | no lock is committed, so dependencies float |
+| Install shards | `shards install` | no lock is committed, so dependencies float to the newest release tag |
 | Format | `make format` | |
 | Lint | `crystal build lib/ameba/src/cli.cr -o bin/ameba`, then `PATH="$PWD/bin:$PATH" make lint` | ameba ships a `targets:` entry, not `executables:`, so `shards install` does not put it on `PATH` |
-| Test | `make test` | needs `TERM=xterm-256color` (see below) |
+| Test | `make test` | environment-independent: the test program env is pinned in `new_test_model` |
 | Parity | clone `dsisnero/crystal_forge`, run `verify_skill_install.sh . go regex`, then `make inventory` | the gate forwards to that skill; it is not vendored here |
 
-The workflow pins `TERM=xterm-256color` for the whole job. Bubble Tea only emits
-the terminal capability queries (DECRQM 2026/2027) when `TERM` looks
-interactive, and the accepted goldens contain those bytes, so an environment
-without `TERM` fails every rendering fixture. Locally, reproducing a CI failure
-means running the specs under a minimal environment:
+Golden captures do not depend on the host terminal. `Teatest.new_test_model`
+sets the program environment to `TERM=xterm-256color` plus
+`TERM_PROGRAM=Apple_Terminal`, which keeps Bubble Tea from emitting the
+synchronized-output query (`ESC[?2026$p ESC[?2027$p`). The pinned Go upstream
+(`bubbletea v2.0.0-rc.1`) has no such query, and its position relative to the
+first frame is scheduling-dependent, so suppressing it keeps the byte stream
+stable. Reproduce the gate environment locally with:
 
 ```bash
-env -i HOME="$HOME" PATH="$PATH" TERM=xterm-256color crystal spec
+env -i HOME="$HOME" PATH="$PATH" crystal spec
 ```
 
-Because dependencies float, a green local suite with an older `lib/` does not
-guarantee a green CI run; `shards update` locally first, and treat a new
-rendering mismatch as fixture review rather than a CI bug.
+Because dependencies float, a green local suite with an old `lib/` does not
+guarantee a green CI run: `shards install` without a lock resolves the newest
+release tag, and a stale `~/.cache/shards` clone can serve older code. If a
+fixture suddenly mismatches, check `git hash-object lib/bubbletea/src/tea.cr`
+against the tag before regenerating anything.
 
 ## Project Structure and Porting Notes
 

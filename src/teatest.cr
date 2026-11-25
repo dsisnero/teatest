@@ -255,6 +255,18 @@ module Teatest
     end
   end
 
+  # Test programs run with a pinned environment so the captured byte stream does
+  # not depend on the host terminal. The pinned Go upstream
+  # (bubbletea v2.0.0-rc.1) never emits terminal capability queries, while the
+  # Crystal shard queries synchronized output whenever its terminal heuristic
+  # sees an interactive terminal; that query is queued through the command
+  # processor, so its position relative to the first frame depends on
+  # scheduling. Reporting an Apple terminal keeps the heuristic false and the
+  # byte stream query-free like Go. Override with `with_program_options`.
+  private def self.test_program_env : Ultraviolet::Environ
+    Ultraviolet::Environ.new(["TERM=xterm-256color", "TERM_PROGRAM=Apple_Terminal"])
+  end
+
   # NewTestModel makes a new TestModel which can be used for tests.
   def self.new_test_model(m : Bubbletea::Model, options : Array(TestOption) = [] of TestOption) : TestModel
     input = IO::Memory.new
@@ -267,6 +279,7 @@ module Teatest
     options.each(&.call(opts))
 
     program = Bubbletea::Program.new(m)
+    program.env = test_program_env
     opts.program_opts.each(&.call(program))
     Tea.with_input(input).call(program)
     Tea.with_output(output).call(program)
