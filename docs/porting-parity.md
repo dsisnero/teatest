@@ -78,6 +78,8 @@ make test
 make inventory
 ```
 
-The ledger is pinned to the `regex` discovery vocabulary; do not change
-`PARITY_PARSER` without the reviewed migration described in
-[plans/parity.md](../plans/parity.md).
+The ledger uses the `tree-sitter` discovery vocabulary
+(`PARITY_PARSER ?= tree-sitter` in the `Makefile`). `make inventory` prints
+`PARITY_DISCOVERY_BACKEND=chiasmus-tree-sitter` when the Chiasmus toolchain is
+available; a `regex` backend means the run is not validating the ledger as
+written. See [plans/parity.md](../plans/parity.md) for the migration record.

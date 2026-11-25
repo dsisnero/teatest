@@ -48,11 +48,19 @@ jobs:
 
       # The parity gate forwards to the installed cross-language-crystal-parity
       # skill, which is not vendored here; fetch it the same way a workstation
-      # install does and point PARITY_SKILL_DIR at it.
+      # install does and point PARITY_SKILL_DIR at it. The ledger uses the
+      # tree-sitter vocabulary, so the preflight resolves the Chiasmus toolchain
+      # (cached across runs).
+      - name: Cache Chiasmus toolchain
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/chiasmus
+          key: chiasmus-${{ runner.os }}-v1
+
       - name: Parity preflight and inventory
         env:
           PARITY_SKILL_DIR: ${{ runner.temp }}/crystal_forge/skills/cross-language-crystal-parity
         run: |
           git clone --depth 1 https://github.com/dsisnero/crystal_forge.git "${RUNNER_TEMP}/crystal_forge"
-          "${PARITY_SKILL_DIR}/scripts/verify_skill_install.sh" . go regex
+          "${PARITY_SKILL_DIR}/scripts/verify_skill_install.sh" . go tree-sitter
           make inventory

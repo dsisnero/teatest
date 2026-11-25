@@ -1,6 +1,6 @@
 PARITY_SKILL_DIR ?= $(HOME)/.agents/skills/crystal_forge/skills/cross-language-crystal-parity
 PARITY_LANGUAGE ?= go
-PARITY_PARSER ?= regex
+PARITY_PARSER ?= tree-sitter
 PARITY_SOURCE ?= vendor/x/exp/teatest/v2
 PARITY_LEDGER ?= plans/inventory/$(PARITY_LANGUAGE)_port_inventory.tsv
 

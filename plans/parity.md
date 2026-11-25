@@ -8,21 +8,16 @@ duplicate it here.
 ## Where we are
 
 - **Current focus:** none — suite, ledger, parity gates, and CI are green. Pick
-  the first item below. CI run `45568077827` (`df0483a`) passed all gates on
-  GitHub; the last feature was the fixture-determinism fix (`2ba58d7`).
+  the first item below. The last feature was the tree-sitter ledger migration
+  (31 symbols, backend `chiasmus-tree-sitter`).
 - **Next up** (ordered; tags: `ready`, `decision`, `periodic`, `blocked`):
-  1. **`ready` Migrate the ledger to tree-sitter ids.** The candidate is
-     assessed below; doing it also replaces the three `alias` file refs and lets
-     `crystal_refs` validate against the native Crystal vocabulary. Exit:
-     re-based ledger, `PORT_PARSER=tree-sitter make inventory` passes,
-     plan/gotchas updated, old regex ledger retired in one reviewed commit.
-  2. **`periodic` Check vendor drift.** `vendor/x` is pinned at `bb9a970`;
+  1. **`periodic` Check vendor drift.** `vendor/x` is pinned at `bb9a970`;
      upstream `charmbracelet/x` main is `8aab43e` (checked 2026-11-24). On the
      next bump: `git -C vendor/x checkout <sha>`, `make parity-refresh`, compare
      `plans/inventory/go_source_parity.tsv`/`go_test_parity.tsv`, and add
      `plans/inventory/v<NN>_delta_triage.tsv`. Exit: refreshed manifests, or a
      recorded "no relevant teatest v2 changes" note.
-  3. **`blocked` Remove the 50ms settle.** The query race is gone (the test
+  2. **`blocked` Remove the 50ms settle.** The query race is gone (the test
      program no longer emits the capability query), but the settle still gives
      both programs a renderer tick so the ping frames land in the capture;
      removing it fails 5/5 with an output mismatch. Revisit only if the port
@@ -43,9 +38,10 @@ duplicate it here.
     `+TERM_PROGRAM=Apple_Terminal`). Each side was byte-identical across all
     five (Go 215 bytes, Crystal 179 bytes); the remaining Go/Crystal difference
     is renderer behavior only.
-  - Ledger refs: 24/27 symbol-validated (`path::kind::name`); the three
-    Crystal `alias` types keep file refs because the regex vocabulary does not
-    discover aliases.
+  - Ledger: 31 symbols tracked with the tree-sitter vocabulary (`class`/
+    `function`/`interface`/`method`/`struct`/`type`), validated against Crystal
+    discovery; three `alias` types (`FinalOpt`, `TestOption`, `WaitForOption`)
+    keep file refs because the vocabulary has no `alias` kind.
   - Snapshot review helpers (`show_snapshot`, `test_and_review!`, `review!`):
     Crystal-only extension, divergence documented; both review helpers return
     pending `*.golden.new` paths, and `test_and_review!` raises on spec failure.
@@ -56,9 +52,14 @@ duplicate it here.
 - **Scoping notes / gotchas:**
   - The source root is `vendor/x/exp/teatest/v2`, not the parent directory:
     `vendor/x/exp/teatest/*.go` still holds the v1 files with the same names.
-  - The curated ledger uses the `regex` discovery vocabulary
-    (`func`/`method`/`struct`/`type`), so pin `PORT_PARSER=regex`; the
-    tree-sitter candidate was reviewed and deferred (assessment below).
+  - The curated ledger uses the `tree-sitter` discovery vocabulary
+    (`class`/`function`/`interface`/`method`/`struct`/`type`), so the gate
+    defaults to `PARITY_PARSER=tree-sitter` and needs the Chiasmus toolchain.
+    Confirm `PARITY_DISCOVERY_BACKEND=chiasmus-tree-sitter` in the output; a
+    `regex` backend means the run is not validating the ledger as written.
+  - Crystal `module` declarations are discovered as `interface` by the native
+    vocabulary (`src/teatest.cr::interface::Program`), and class methods carry
+    their scope (`src/teatest.cr::method::TestModel.send`).
   - `shards install` resolves what `shard.yml` asks for: `bubbletea` now pins
     `branch: main` explicitly, so installs take branch HEAD (`a1f8c46` today,
     reported as `2.1.0+git.commit…`), while unversioned shards such as `golden`
@@ -89,11 +90,12 @@ duplicate it here.
   refresh the goldens`); before that `2ba58d7` (determinism), `df0483a` (CI
   input fix), `ff44b6b` (CI workflow), `b020c55` (review helpers), `0af8267`
 - **Gates:** `make format` pass; `make lint` pass; `make test` 14 examples,
-  0 failures on 5 consecutive runs after the `bubbletea` `main` refresh (13
-  earlier with `TERM` unset); `make inventory` pass (27 items tracked, backend
-  `regex`, Crystal symbols validated); clean-room CI simulation pass
-  end-to-end; parity preflight `PARITY_SKILL_VERIFIED=1`; GitHub `CI` runs
-  `45567742970`, `45568077827`, and `45568476812` success.
+  0 failures on 5 consecutive runs after the `bubbletea` `main` refresh;
+  `make inventory` pass (31 items tracked, backend `chiasmus-tree-sitter`,
+  Crystal symbols validated); kind-vocabulary scan reports no drops;
+  clean-room CI simulation pass end-to-end; parity preflight
+  `PARITY_SKILL_VERIFIED=1`; GitHub `CI` runs `45567742970`, `45568077827`,
+  and `45568476812` success.
 
 Keep this block accurate after every feature: the next session reads it first
 (see [AGENTS.md](../AGENTS.md) → **How to resume**).
@@ -138,7 +140,9 @@ Keep this block accurate after every feature: the next session reads it first
       `PORT_CRYSTAL_SOURCE=src` (Crystal `alias` types keep file refs until the
       tree-sitter vocabulary is adopted)
 - [x] Review the tree-sitter migration candidate (assessment below)
-- [ ] Migrate the ledger to tree-sitter ids as a dedicated reviewed change
+- [x] Migrate the ledger to tree-sitter ids: 31 symbols, native Crystal symbol
+      refs (`method::Class.name`, `module` → `interface`), `PARITY_PARSER`
+      default switched, CI preflight resolves the toolchain
 
 ## Phase 5 — Dependency alignment
 
@@ -159,8 +163,9 @@ Keep this block accurate after every feature: the next session reads it first
 parity preflight plus `make inventory` on push/PR. It checks out submodules,
 installs Crystal 1.22.3 (the compiler that accepted the fixtures), installs
 floating shards, builds `ameba` from the locked dependency (the shard exposes a
-`targets:` entry, not `executables:`), and clones `dsisnero/crystal_forge` for
-`PARITY_SKILL_DIR`.
+`targets:` entry, not `executables:`), caches `~/.cache/chiasmus`, clones
+`dsisnero/crystal_forge` for `PARITY_SKILL_DIR`, and resolves the tree-sitter
+toolchain with `verify_skill_install.sh . go tree-sitter`.
 
 A clean-room clone (no lock, empty `lib/`) reproduces the gates locally with the
 same commands, and GitHub run `45568077827` (`df0483a`, 2m31s) passed all of
@@ -190,9 +195,9 @@ inside `new_test_model`, so captures are environment-independent.
   had this trigger fire, but the cause was a branch-local `lib/` install and a
   stale cache rather than floating versions.)
 
-## Tree-sitter candidate assessment (2026-11-24)
+## Tree-sitter ledger migration (assessed 2026-11-24, completed 2026-11-25)
 
-Generated a native candidate for `vendor/x/exp/teatest/v2` with
+Assessed a native candidate for `vendor/x/exp/teatest/v2` with
 `PORT_PARSER=tree-sitter` (backend `chiasmus-tree-sitter`, toolchain v0.3.4):
 
 - 31 declarations vs 27 in the regex ledger.
@@ -200,11 +205,23 @@ Generated a native candidate for `vendor/x/exp/teatest/v2` with
   `type::Program` → `interface::Program`.
 - Adds four internal declarations the regex extractor skips: `safe`,
   `doWaitFor`, `safeReadWriter`, `waitDone`.
-- No `definition.type` rows; the kind-vocabulary gate reports no drops.
 
-Decision: keep `PORT_PARSER=regex` and the current ledger. Migrating would
-rewrite all 27 ids and pull in internal helpers; do it as its own reviewed
-change with a re-based ledger and a fresh `crystal_refs` migration.
+Completed migration (one reviewed change):
+
+- All ids re-based on the tree-sitter vocabulary; `safe` is recorded as
+  `intentional_divergence` (the Crystal port constructs `SafeReadWriter`
+  directly), and the four internals are tracked with their private Crystal
+  counterparts (`Teatest.do_wait_for`, `TestModel.wait_done`).
+- `crystal_refs` now use native scoped symbols
+  (`src/teatest.cr::method::TestModel.send`); Crystal `module` declarations are
+  discovered as `interface`, so `Teatest::Program` is
+  `src/teatest.cr::interface::Program`.
+- The three `alias` types still use file refs: the vocabulary has no `alias`
+  kind, which the original assessment assumed would be solved by the migration.
+- `PARITY_PARSER` defaults to `tree-sitter`; CI caches `~/.cache/chiasmus`,
+  runs the tree-sitter preflight, and `make inventory` fails loudly instead of
+  falling back to regex because the mode is explicit.
+- `make inventory`: 31 items tracked, backend `chiasmus-tree-sitter`.
 
 ## Intentional divergences
 

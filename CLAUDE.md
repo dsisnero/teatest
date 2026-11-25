@@ -79,20 +79,22 @@ must not carry a copied Ruby implementation. Updating the installed skill does
 not update repository instructions — check the forwarded target when inventory
 behavior changes.
 
-The curated ledger (`plans/inventory/go_port_inventory.tsv`) uses the `regex`
-discovery vocabulary, so the gate pins `PORT_PARSER=regex` (`PARITY_PARSER` in
-the `Makefile`). `make inventory` also sets `PORT_CRYSTAL_SOURCE=src`, so
-`crystal_refs` entries written as `path::kind::name` are validated against
-Crystal discovery; use that form for new refs (file-only refs are reserved for
-Crystal `alias` types, which the regex vocabulary does not discover). Keep the
-parser mode until the tree-sitter migration in `plans/parity.md` is reviewed: a
-requested parser mode does not prove which extractor ran, so confirm
-`PARITY_DISCOVERY_BACKEND` in the gate output.
+The curated ledger (`plans/inventory/go_port_inventory.tsv`) uses the
+`tree-sitter` discovery vocabulary, so the gate defaults to
+`PORT_PARSER=tree-sitter` (`PARITY_PARSER` in the `Makefile`). `make inventory`
+also sets `PORT_CRYSTAL_SOURCE=src`, so `crystal_refs` entries written as
+`path::kind::name` are validated against Crystal discovery; use that form for new
+refs. The symbol half comes from the native vocabulary: class methods are
+`method::Class.name`, Crystal `module` declarations appear as `interface`, and
+file-only refs are reserved for `alias` types, which the vocabulary does not
+discover. A requested parser mode does not prove which extractor ran, so confirm
+`PARITY_DISCOVERY_BACKEND=chiasmus-tree-sitter` in the gate output (it prints
+`regex` if the toolchain is missing and the mode was `auto`).
 
 ```bash
 PARITY_SKILL_DIR="${PARITY_SKILL_DIR:-$HOME/.agents/skills/crystal_forge/skills/cross-language-crystal-parity}"
-"${PARITY_SKILL_DIR}/scripts/verify_skill_install.sh" . go regex
-PORT_PARSER=regex make inventory
+"${PARITY_SKILL_DIR}/scripts/verify_skill_install.sh" . go tree-sitter
+make inventory
 ```
 
 Curated kinds for Go are gated separately:

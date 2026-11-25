@@ -49,16 +49,18 @@ settle was lost — see
 fixture to hide it.
 
 `make inventory` forwards to the installed cross-language parity skill and
-prints `PARITY_DISCOVERY_BACKEND=regex`. It also validates `crystal_refs`
-symbols against `src` (`PORT_CRYSTAL_SOURCE=src`), so a renamed method fails the
-gate. The ledger was built with the regex vocabulary, so do not switch the
-parser without the reviewed migration in [plans/parity.md](../plans/parity.md).
+prints `PARITY_DISCOVERY_BACKEND=chiasmus-tree-sitter`. It also validates
+`crystal_refs` symbols against `src` (`PORT_CRYSTAL_SOURCE=src`), so a renamed
+method fails the gate. The ledger uses the tree-sitter vocabulary; if the
+backend line says `regex`, the Chiasmus toolchain is missing and the run is not
+the gate you think it is.
 
-Optional strict preflight (checks the skill wrappers are executable):
+Optional strict preflight (checks the skill wrappers are executable and resolves
+the toolchain):
 
 ```bash
 PARITY_SKILL_DIR="${HOME}/.agents/skills/crystal_forge/skills/cross-language-crystal-parity"
-"${PARITY_SKILL_DIR}/scripts/verify_skill_install.sh" . go regex
+"${PARITY_SKILL_DIR}/scripts/verify_skill_install.sh" . go tree-sitter
 ```
 
 ## 4. Pick the next feature
