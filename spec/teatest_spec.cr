@@ -86,10 +86,17 @@ describe Teatest do
     end
 
     describe "test_and_review!" do
-      it "returns error for failing command" do
-        result = Teatest.test_and_review!("false")
-        result.size.should eq 1
-        result[0][0].should eq "error"
+      it "raises when the spec command fails" do
+        error = expect_raises(Exception) do
+          Teatest.test_and_review!("false")
+        end
+        error.message.should eq "spec command 'false' failed with exit code 1"
+      end
+
+      it "returns pending snapshots after a passing command" do
+        with_pending_snapshot do |dir, pending_path|
+          Teatest.test_and_review!("true", dir).should eq [pending_path]
+        end
       end
     end
 
@@ -98,7 +105,30 @@ describe Teatest do
         Golden.cleanup! # clean any stale pending files
         Teatest.review!.should be_empty
       end
+
+      it "returns and prints pending snapshots" do
+        with_pending_snapshot do |dir, pending_path|
+          io = IO::Memory.new
+          Teatest.review!(dir, io).should eq [pending_path]
+          io.to_s.should contain "1 pending snapshot(s) found:"
+          io.to_s.should contain pending_path
+        end
+      end
     end
+  end
+end
+
+# Yields an empty snapshot directory containing one pending `*.golden.new`
+# file, along with the pending path. The directory is removed afterwards.
+def with_pending_snapshot(&)
+  dir = File.join(Dir.tempdir, "teatest-review-#{Process.pid}-#{Random.rand(1_000_000)}")
+  FileUtils.mkdir_p(dir)
+  pending_path = File.join(dir, "Sample.golden.new")
+  File.write(pending_path, "pending\n")
+  begin
+    yield dir, pending_path
+  ensure
+    FileUtils.rm_rf(dir)
   end
 end
 

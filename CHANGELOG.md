@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+- `Teatest.review!` now returns the pending `*.golden.new` paths (still printed
+  for humans) and accepts an optional `io`.
+- `Teatest.test_and_review!` now returns the pending snapshot paths and raises
+  when the spec command fails, instead of returning an `{"error", message}`
+  sentinel tuple.
+
 ## [0.2.0] - 2026-07-27
 
 - Added `show_snapshot` to read golden snapshot files

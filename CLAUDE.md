@@ -54,8 +54,8 @@ Teatest.require_equal_output("TestName", output_bytes)
 
 # Snapshot management (Crystal-only extension)
 Teatest.show_snapshot(path)            # read golden file
-Teatest.test_and_review!("crystal spec") # run specs then review
-Teatest.review!                        # list pending snapshots
+Teatest.test_and_review!("crystal spec") # run specs, return pending snapshots
+Teatest.review!                        # return + print pending snapshots
 ```
 
 ## Principles

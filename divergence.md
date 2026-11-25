@@ -67,7 +67,9 @@ status: [plans/inventory/go_port_inventory.tsv](plans/inventory/go_port_inventor
 3. **Snapshot review helpers**: `show_snapshot`, `test_and_review!`, and
    `review!` are a Crystal-only extension layered on `dsisnero/golden`, which
    exposes pending-snapshot review. Go relies on `testing.TB` failure hooks
-   instead.
+   instead. Both review helpers return the pending `*.golden.new` paths:
+   `review!` still prints them for humans, and `test_and_review!` raises when
+   the spec command fails rather than returning an error sentinel.
 
 ## Policy
 

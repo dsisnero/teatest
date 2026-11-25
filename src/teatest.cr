@@ -303,25 +303,25 @@ module Teatest
   end
 
   # TestAndReview runs the spec command, then calls review! for pending snapshots.
-  def self.test_and_review!(spec_cmd : String = "crystal spec", snapshot_dir : String? = nil) : Array(Tuple(String, String))
+  # Raises if the spec command fails.
+  def self.test_and_review!(spec_cmd : String = "crystal spec", snapshot_dir : String? = nil) : Array(String)
     result = Process.run(spec_cmd, shell: true)
-    if result.success?
-      review!(snapshot_dir)
-    else
-      [{"error", "spec command '#{spec_cmd}' failed with exit code #{result.exit_code}"}]
+    unless result.success?
+      raise "spec command '#{spec_cmd}' failed with exit code #{result.exit_code}"
     end
+
+    review!(snapshot_dir)
   end
 
-  # Review lists pending golden snapshots.
-  def self.review!(dir : String? = nil) : Array(Tuple(String, String))
-    search_dir = dir || Golden.dir
-    pending = Dir.glob(File.join(search_dir, "**/*.golden.new")).sort
-    return [] of Tuple(String, String) if pending.empty?
+  # Review returns the pending golden snapshots and prints them for humans.
+  def self.review!(dir : String? = nil, io : IO = STDERR) : Array(String)
+    pending = Golden.pending_snapshots(dir)
+    return pending if pending.empty?
 
-    STDERR.puts "#{pending.size} pending snapshot(s) found:"
-    pending.each { |path| STDERR.puts "  #{path}" }
-    STDERR.puts "Run `Golden.accept_all!` to accept all, or `Golden.reject_all!` to reject."
-    [] of Tuple(String, String)
+    io.puts "#{pending.size} pending snapshot(s) found:"
+    pending.each { |path| io.puts "  #{path}" }
+    io.puts "Run `Golden.accept_all!` to accept all, or `Golden.reject_all!` to reject."
+    pending
   end
 
   class SafeReadWriter < IO

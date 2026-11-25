@@ -46,11 +46,11 @@ end
 # Show a golden snapshot
 Teatest.show_snapshot("spec/testdata/TestApp.golden")
 
-# Run tests then review pending snapshots
-Teatest.test_and_review!("crystal spec")
+# Run tests then review pending snapshots (raises if the specs fail)
+pending = Teatest.test_and_review!("crystal spec")
 
-# List pending snapshots
-Teatest.review!
+# List pending snapshots (returns the paths and prints them to STDERR)
+pending = Teatest.review!
 ```
 
 ### Available Methods
@@ -58,8 +58,11 @@ Teatest.review!
 | Method | Description |
 |--------|-------------|
 | `show_snapshot(path)` | Read and return a golden file's content |
-| `test_and_review!(spec_cmd, snapshot_dir)` | Run specs, then review pending snapshots |
-| `review!(dir)` | List pending golden snapshots |
+| `test_and_review!(spec_cmd, snapshot_dir)` | Run specs, then return pending snapshot paths; raises when the specs fail |
+| `review!(dir, io = STDERR)` | Return pending golden snapshot paths and print them to `io` |
+
+Both review helpers return the pending `*.golden.new` paths so callers can
+accept or reject them programmatically instead of parsing log output.
 
 ## Updating Golden Files
 

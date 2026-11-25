@@ -8,36 +8,27 @@ duplicate it here.
 ## Where we are
 
 - **Current focus:** none — suite, ledger, and parity gates are green. Pick the
-  first `ready` item below; the last completed work was the dependency refresh
-  plus the `send_spec` settle (`0af8267`).
+  first `ready` item below; the last completed work was returning pending
+  snapshots from the review helpers.
 - **Next up** (ordered; tags: `ready`, `decision`, `periodic`, `blocked`):
-  1. **`decision` Pin dependencies.** `/shard.lock` is gitignored, so
-     `make update` moved `golden` 0.2.0 → 0.3.0 and the rendering fixtures had
-     to be re-accepted. Choose: commit `shard.lock` (drop it from `.gitignore`)
-     for reproducible builds, or keep floating deps and treat fixture churn as
-     expected. Exit: decision recorded here; if pinning, lock committed and
-     gates re-run from a clean checkout.
-  2. **`ready` Return pending snapshots from `review!`.** `Teatest.review!`
-     prints pending `.golden.new` files but always returns `[]`, so
-     `test_and_review!` cannot report them either. Return the pending paths (or
-     an accept/reject result), keep printing for humans, and add a spec for the
-     pending and empty cases. Exit: spec + README/API docs updated.
-  3. **`ready` Add CI for the gates.** There is no `.github/workflows`. Add a
+  1. **`ready` Add CI for the gates.** There is no `.github/workflows`. Add a
      workflow running `make format`, `make lint`, `make test`, `make inventory`,
-     and the parity preflight on push/PR. Exit: green run on the current commit;
-     apply the `shard.lock` decision from item 1.
-  4. **`ready` Migrate the ledger to tree-sitter ids.** The candidate is
+     and the parity preflight on push/PR. Exit: green run on the current commit.
+     Dependencies stay floating (decision below), so CI runs `make install`
+     without a lock — a freshly floated dependency that changes rendering may
+     fail this job, and that failure means "review fixtures", not "fix CI".
+  2. **`ready` Migrate the ledger to tree-sitter ids.** The candidate is
      assessed below; doing it also replaces the three `alias` file refs and lets
      `crystal_refs` validate against the native Crystal vocabulary. Exit:
      re-based ledger, `PORT_PARSER=tree-sitter make inventory` passes,
      plan/gotchas updated, old regex ledger retired in one reviewed commit.
-  5. **`periodic` Check vendor drift.** `vendor/x` is pinned at `bb9a970`;
+  3. **`periodic` Check vendor drift.** `vendor/x` is pinned at `bb9a970`;
      upstream `charmbracelet/x` main is `8aab43e` (checked 2026-11-24). On the
      next bump: `git -C vendor/x checkout <sha>`, `make parity-refresh`, compare
      `plans/inventory/go_source_parity.tsv`/`go_test_parity.tsv`, and add
      `plans/inventory/v<NN>_delta_triage.tsv`. Exit: refreshed manifests, or a
      recorded "no relevant teatest v2 changes" note.
-  6. **`blocked` Remove the 50ms settle.** Installed `bubbletea` 2.0.8 still
+  4. **`blocked` Remove the 50ms settle.** Installed `bubbletea` 2.0.8 still
      queues the capability query through `execute`; when a release makes the
      flush deterministic, delete the sleep in `spec/send_spec.cr`, regenerate
      fixtures in the same environment, and re-run the suite 10×. Exit: settle
@@ -54,7 +45,12 @@ duplicate it here.
     Crystal `alias` types keep file refs because the regex vocabulary does not
     discover aliases.
   - Snapshot review helpers (`show_snapshot`, `test_and_review!`, `review!`):
-    Crystal-only extension, divergence documented.
+    Crystal-only extension, divergence documented; both review helpers return
+    pending `*.golden.new` paths, and `test_and_review!` raises on spec failure.
+  - Dependency policy: **floating** (decision below). `shard.lock` stays
+    gitignored, so `make update`/`make install` may bump `golden`/`bubbletea`
+    and invalidate rendering fixtures; treat that as expected churn and
+    re-accept fixtures in the bump commit.
 - **Scoping notes / gotchas:**
   - The source root is `vendor/x/exp/teatest/v2`, not the parent directory:
     `vendor/x/exp/teatest/*.go` still holds the v1 files with the same names.
@@ -74,10 +70,10 @@ duplicate it here.
   - `bubbletea.cr`/`ultraviolet` emit terminal capability queries
     (`ESC[?2026$p`, `ESC[?2027$p`) and modify-other-keys mode
     (`ESC[>4;2m`) that Go only emits in a querying environment.
-- **Last feature commit:** `0af8267` (`port: stabilize send_spec around the
-  capability-query boundary`); earlier `44101b0` (numbered shard reports) and
-  `dd0267c` (ledger symbol refs)
-- **Gates:** `make format` pass; `make lint` pass; `make test` 12 examples,
+- **Last feature commit:** `9ee4719` (plan backlog); last feature was
+  `0af8267` (`port: stabilize send_spec around the capability-query boundary`);
+  earlier `44101b0` (numbered shard reports) and `dd0267c` (ledger symbol refs)
+- **Gates:** `make format` pass; `make lint` pass; `make test` 14 examples,
   0 failures on 10 of 10 runs; `make inventory` pass (27 items tracked, backend
   `regex`, Crystal symbols validated); adversarial signoff pass (`crystal spec`
   + upstream `go test ./...`).
@@ -111,6 +107,9 @@ Keep this block accurate after every feature: the next session reads it first
 ## Phase 3 — Snapshot workflow
 
 - [x] Add `show_snapshot`, `test_and_review!`, `review!` wrappers
+- [x] Return pending snapshot paths from `review!` and `test_and_review!`, keep
+      printing for humans, and raise when the spec command fails
+      (`spec/teatest_spec.cr` pending/empty/failing cases)
 - [x] Accept the reviewed `TestApp` golden and the current send fixture
 - [x] Keep `spec/testdata/` in sync with the accepted behavior
 
@@ -132,6 +131,20 @@ Keep this block accurate after every feature: the next session reads it first
 - [ ] Remove the settle once the boundary is deterministic upstream and the
       fixtures can be regenerated in the same environment
 
+## Dependency policy decision (2026-11-24)
+
+`/shard.lock` stays gitignored: **dependencies remain floating**.
+
+- Rationale: the port tracks unreleased Crystal shards (`bubbletea.cr`,
+  `golden`, `ultraviolet`), so floating pulls fixes without ceremony; rendering
+  fixture churn after `make update` is expected and is re-accepted in the bump
+  commit (as with `golden` 0.2.0 → 0.3.0).
+- Consequences: `make install`/`make update` can change the byte stream, so
+  never commit a fixture diff without naming the dependency change; CI (next
+  up) has no lock to restore and must reinstall from scratch.
+- Revisit if: two machines disagree on a fixture, or an upstream regression
+  cannot be attributed without a bisectable lock.
+
 ## Tree-sitter candidate assessment (2026-11-24)
 
 Generated a native candidate for `vendor/x/exp/teatest/v2` with
@@ -152,7 +165,9 @@ change with a re-based ledger and a fresh `crystal_refs` migration.
 
 - Snapshot review helpers (`show_snapshot`, `test_and_review!`, `review!`):
   Go relies on `testing.TB` failure hooks; the Crystal port layers these on
-  `dsisnero/golden`, which exposes pending-snapshot review instead.
+  `dsisnero/golden`, which exposes pending-snapshot review instead. The review
+  helpers return pending `*.golden.new` paths, and `test_and_review!` raises on
+  spec failure instead of returning an error sentinel.
 - `Teatest.new_test_model` does not take a `testing.TB` equivalent: Crystal
   `Spec` failures are global, so errors are raised as exceptions.
 - `TestModel#send` accepts non-`Tea::Msg` values through `Tea.wrap`, mirroring
