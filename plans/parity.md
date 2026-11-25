@@ -7,27 +7,22 @@ duplicate it here.
 
 ## Where we are
 
-- **Current focus:** none — suite, ledger, and parity gates are green, and the
-  golden fixtures are now environment-independent. The last work was CI plus the
-  fixture-determinism fix (pinned test-program environment, refreshed fixtures).
+- **Current focus:** none — suite, ledger, parity gates, and CI are green. Pick
+  the first item below. CI run `45568077827` (`df0483a`) passed all gates on
+  GitHub; the last feature was the fixture-determinism fix (`2ba58d7`).
 - **Next up** (ordered; tags: `ready`, `decision`, `periodic`, `blocked`):
-  1. **`ready` Push and confirm the first CI run.** `.github/workflows/ci.yml`
-     exists and was validated with a clean-room clone (fresh `shards install`,
-     no lock): format, lint, test, and inventory all pass. Local `main` is ahead
-     of `origin/main`, so the workflow has never run on GitHub. Exit: green run
-     on GitHub for this commit.
-  2. **`ready` Migrate the ledger to tree-sitter ids.** The candidate is
+  1. **`ready` Migrate the ledger to tree-sitter ids.** The candidate is
      assessed below; doing it also replaces the three `alias` file refs and lets
      `crystal_refs` validate against the native Crystal vocabulary. Exit:
      re-based ledger, `PORT_PARSER=tree-sitter make inventory` passes,
      plan/gotchas updated, old regex ledger retired in one reviewed commit.
-  3. **`periodic` Check vendor drift.** `vendor/x` is pinned at `bb9a970`;
+  2. **`periodic` Check vendor drift.** `vendor/x` is pinned at `bb9a970`;
      upstream `charmbracelet/x` main is `8aab43e` (checked 2026-11-24). On the
      next bump: `git -C vendor/x checkout <sha>`, `make parity-refresh`, compare
      `plans/inventory/go_source_parity.tsv`/`go_test_parity.tsv`, and add
      `plans/inventory/v<NN>_delta_triage.tsv`. Exit: refreshed manifests, or a
      recorded "no relevant teatest v2 changes" note.
-  4. **`blocked` Remove the 50ms settle.** The query race is gone (the test
+  3. **`blocked` Remove the 50ms settle.** The query race is gone (the test
      program no longer emits the capability query), but the settle still gives
      both programs a renderer tick so the ping frames land in the capture;
      removing it fails 5/5 with an output mismatch. Revisit only if the port
@@ -86,14 +81,14 @@ duplicate it here.
   - `.golden.new` (pending review) and `*.golden.meta` (golden metadata) are
     artifacts, not fixtures; never commit them.
 - **Last feature commit:** `2ba58d7` (`fix(teatest): pin the test program
-  environment so goldens are deterministic`); before that `ff44b6b` (CI
-  workflow), `b020c55` (review helpers), `0af8267` (send_spec settle),
-  `44101b0`, `dd0267c`
+  environment so goldens are deterministic`) plus `df0483a` (CI input fix);
+  before that `ff44b6b` (CI workflow), `b020c55` (review helpers), `0af8267`
+  (send_spec settle), `44101b0`, `dd0267c`
 - **Gates:** `make format` pass; `make lint` pass; `make test` 14 examples,
   0 failures on 13 consecutive runs (5 of them with `TERM` unset);
   `make inventory` pass (27 items tracked, backend `regex`, Crystal symbols
   validated); clean-room CI simulation pass end-to-end; parity preflight
-  `PARITY_SKILL_VERIFIED=1`.
+  `PARITY_SKILL_VERIFIED=1`; GitHub `CI` run `45568077827` success.
 
 Keep this block accurate after every feature: the next session reads it first
 (see [AGENTS.md](../AGENTS.md) → **How to resume**).
@@ -163,8 +158,9 @@ floating shards, builds `ameba` from the locked dependency (the shard exposes a
 `PARITY_SKILL_DIR`.
 
 A clean-room clone (no lock, empty `lib/`) reproduces the gates locally with the
-same commands. The workflow no longer pins `TERM`: the test-program environment
-is pinned inside `new_test_model`, so captures are environment-independent.
+same commands, and GitHub run `45568077827` (`df0483a`, 2m31s) passed all of
+them. The workflow does not pin `TERM`: the test-program environment is pinned
+inside `new_test_model`, so captures are environment-independent.
 
 ## Dependency policy decision (2026-11-24)
 
