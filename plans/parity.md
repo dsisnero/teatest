@@ -49,8 +49,9 @@ duplicate it here.
   - `bubbletea.cr`/`ultraviolet` emit terminal capability queries
     (`ESC[?2026$p`, `ESC[?2027$p`) and modify-other-keys mode
     (`ESC[>4;2m`) that Go does not, which is the source of golden drift.
-- **Last commit:** `5545ced` (`feat(teatest): add show_snapshot,
-  test_and_review!, review! wrappers`)
+- **Last feature commit:** `dbad171` (`chore(parity): adopt canonical parity
+  tooling and review golden fixtures`); previous feature `5545ced`
+  (`feat(teatest): add show_snapshot, test_and_review!, review! wrappers`)
 - **Gates:** `make format` pass; `make lint` pass; `make test` 12 examples,
   0 failures on 4 of 5 runs (1 send flake, above); `make inventory` pass
   (27 items tracked, backend `regex`); upstream `go test ./...` in
