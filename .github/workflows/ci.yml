@@ -51,8 +51,28 @@ jobs:
       # install does and point PARITY_SKILL_DIR at it. The ledger uses the
       # tree-sitter vocabulary, so the preflight resolves the Chiasmus toolchain
       # (cached across runs).
+      # The Chiasmus Linux binary links against the tree-sitter runtime shared
+      # object (`libtree-sitter.so.0.26`), which the Ubuntu image does not
+      # ship. Build the matching 0.26 release once and cache it.
+      - name: Cache tree-sitter runtime
+        id: tree-sitter-cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.local/tree-sitter
+          key: tree-sitter-0.26.13-${{ runner.os }}
+
+      - name: Build tree-sitter runtime
+        if: steps.tree-sitter-cache.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth 1 --branch v0.26.13 https://github.com/tree-sitter/tree-sitter.git "${RUNNER_TEMP}/tree-sitter"
+          make -C "${RUNNER_TEMP}/tree-sitter" -j"$(nproc)"
+          make -C "${RUNNER_TEMP}/tree-sitter" install PREFIX="${HOME}/.local/tree-sitter"
+
+      - name: Expose tree-sitter runtime
+        run: echo "LD_LIBRARY_PATH=${HOME}/.local/tree-sitter/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}" >> "$GITHUB_ENV"
+
       - name: Cache Chiasmus toolchain
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/chiasmus
           key: chiasmus-${{ runner.os }}-v1

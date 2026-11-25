@@ -85,7 +85,8 @@ every push to `main` and every pull request:
 | Format | `make format` | |
 | Lint | `crystal build lib/ameba/src/cli.cr -o bin/ameba`, then `PATH="$PWD/bin:$PATH" make lint` | ameba ships a `targets:` entry, not `executables:`, so `shards install` does not put it on `PATH` |
 | Test | `make test` | environment-independent: the test program env is pinned in `new_test_model` |
-| Parity | clone `dsisnero/crystal_forge`, run `verify_skill_install.sh . go tree-sitter` (downloads the Chiasmus toolchain), then `make inventory` | the gate forwards to that skill; it is not vendored here |
+| Tree-sitter runtime | build `tree-sitter` v0.26.13 into `~/.local/tree-sitter` (cached) | the Chiasmus Linux binary links `libtree-sitter.so.0.26`, which the Ubuntu image lacks |
+| Parity | clone `dsisnero/crystal_forge`, run `verify_skill_install.sh . go tree-sitter` (downloads/caches the Chiasmus toolchain), then `make inventory` | the gate forwards to that skill; it is not vendored here |
 
 Golden captures do not depend on the host terminal. `Teatest.new_test_model`
 sets the program environment to `TERM=xterm-256color` plus

@@ -163,7 +163,9 @@ Keep this block accurate after every feature: the next session reads it first
 parity preflight plus `make inventory` on push/PR. It checks out submodules,
 installs Crystal 1.22.3 (the compiler that accepted the fixtures), installs
 floating shards, builds `ameba` from the locked dependency (the shard exposes a
-`targets:` entry, not `executables:`), caches `~/.cache/chiasmus`, clones
+`targets:` entry, not `executables:`), builds and caches the `tree-sitter`
+v0.26 runtime (the Chiasmus Linux binary needs `libtree-sitter.so.0.26`, which
+Ubuntu does not ship), caches `~/.cache/chiasmus`, clones
 `dsisnero/crystal_forge` for `PARITY_SKILL_DIR`, and resolves the tree-sitter
 toolchain with `verify_skill_install.sh . go tree-sitter`.
 
