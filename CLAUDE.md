@@ -186,7 +186,8 @@ Common issues:
 - **Type naming**: CamelCase for classes/modules; snake_case for methods.
 - **Tooling hygiene**: parity scripts forward to the installed skill; never
   copy its Ruby implementation into `scripts/`.
-- **Dependency bugs**: never patch `lib/` in place. Write a numbered report in
-  `shards_issues/<shard>.<upstream-issue-number>.md` (for example
-  `shards_issues/bubbletea.5.md`) with summary, environment, reproduction,
-  actual/expected, root cause, and proposed fix.
+- **Dependency bugs**: never patch `lib/` in place. Write a report in
+  `lib_issues/<shard>.<short-slug>.md` (for example
+  `lib_issues/bubbletea.capability-query-race.md`) with summary, environment,
+  reproduction, actual/expected, root cause, and proposed fix. Link the
+  upstream issue in the file header when one exists.

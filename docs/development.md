@@ -81,9 +81,9 @@
   source of truth; `exp/teatest/*.go` is the older v1 code.
 - `plans/parity.md` — curated feature roadmap and current state.
 - `plans/inventory/` — parity ledger plus generated source/test manifests.
-- `shards_issues/` — numbered bug reports for dependency shards, named
-  `<shard>.<upstream-issue-number>.md` (e.g. `bubbletea.5.md`). Report the bug
-  here instead of patching `lib/` in place.
+- `lib_issues/` — dependency bug reports named `<shard>.<short-slug>.md`
+  (e.g. `bubbletea.capability-query-race.md`); link the upstream issue in the
+  header when one exists. Report bugs here instead of patching `lib/` in place.
 - `scripts/` — forwarding wrappers for the installed parity skill; do not add
   copied skill implementations here.
 

@@ -43,7 +43,7 @@ Format, lint, and inventory must pass before changing anything. `make test`
 passes most runs; the known exception is `TestAppSendToOtherProgram`, which can
 fail when the two programs' capability-query bytes land in different positions.
 That is the top item in the plan's **Next up** list
-([shards_issues/bubbletea.5.md](../shards_issues/bubbletea.5.md)),
+([lib_issues/bubbletea.capability-query-race.md](../lib_issues/bubbletea.capability-query-race.md)),
 not golden drift — do not normalize the fixture to hide it.
 
 `make inventory` forwards to the installed cross-language parity skill and
